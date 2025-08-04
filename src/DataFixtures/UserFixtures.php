@@ -1,0 +1,44 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\User;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+class UserFixtures extends Fixture
+{
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher){}
+
+    public function load(ObjectManager $manager): void
+    {
+        $faker = \Faker\Factory::create('fr_FR');
+        $admin = new User();
+        $prenom = $faker->firstName;
+        $nom = $faker->lastName;
+        $admin->setNom($nom);
+        $admin->setPrenom($prenom);
+        $admin->setEmail('admin@eni.fr');
+        $admin->setPseudo('admin-'.strtolower($prenom));
+        $password = $this->passwordHasher->hashPassword($admin, '123456');
+        $admin->setPassword($password);
+        $admin->setRoles(['ROLE_ADMIN']);
+        $manager->persist($admin);
+
+        //création d'utilisateur avec le rôle USER
+        for ($i = 1; $i <= 10; $i++) {
+            $user = new User();
+            $prenom = $faker->firstName;
+            $nom = $faker->lastName;
+            $user->setNom($nom);
+            $user->setPrenom($prenom);
+            $user->setEmail(strtolower($prenom).'.'.strtolower($nom).'@eni.fr');
+            $user->setPseudo(strtolower($prenom).' - '.strtolower($nom));
+            $password = $this->passwordHasher->hashPassword($user, '123456');
+            $user->setPassword($password);
+            $manager->persist($user);
+        }
+        $manager->flush();
+    }
+}
