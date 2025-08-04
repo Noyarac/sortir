@@ -22,7 +22,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(message:"Veuillez indiquer votre adresse mail")]
-    #[Assert\Assert\Email(message: "Veuillez entrer une adresse mail valide")]
+    #[Assert\Email(message: "Veuillez entrer une adresse mail valide")]
     private ?string $email = null;
 
     /**
@@ -39,23 +39,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message:"Veuillez indiquer votre nom")]
-    #[Assert\Assert\Length(min: 2, max: 50, minMessage: 'Le nom doit comporter au moins 2 caractères',
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Le nom doit comporter au moins 2 caractères',
     maxMessage:'Le nom doit comporter au maximum 50 caractères')]
     private ?string $nom = null;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message:"Veuillez indiquer votre prénom")]
-    #[Assert\Assert\Length(min: 2, max: 50, minMessage: 'Le prénom doit comporter au moins 2 caractères',
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Le prénom doit comporter au moins 2 caractères',
         maxMessage:'Le prénom doit comporter au maximum 50 caractères')]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message:"Veuillez indiquer votre pseudo")]
-    #[Assert\Assert\Length(min: 2, max: 50, minMessage: 'Le pseudo doit comporter au moins 2 caractères',
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Le pseudo doit comporter au moins 2 caractères',
         maxMessage:'Le pseudo doit comporter au maximum 50 caractères')]
     private ?string $pseudo = null;
 
-    #[Assert\NotBlank(message:"Veuillez indiquer votre numéro de téléphone")]
+
+    #[Assert\Regex([
+        'pattern'=>"/^(0[67])([ .]?\d{2}){4}$/",
+        'message'=>"Oops! le format du numéro ne semble pas valide. Le numéro de téléphone doit commencer par 06 ou 07. Les chiffres peuvent être séparés par un espace ou un point."])]
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $telephone = null;
 
@@ -199,7 +202,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setTelephone(?string $telephone): static
     {
-        $this->telephone = $telephone;
+        //retrait des points et espaces du numéro de téléphone
+        $telephoneNormalise = str_replace([".", " "],"", $telephone);
+        $this->telephone = $telephoneNormalise;
 
         return $this;
     }
