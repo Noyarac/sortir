@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sorties pour {{campus.nom}}{% endblock %}
+
+{% block body %}
+{% for sortie in sorties %}
+    <div>{{sortie.nom}}</div>
+{% endfor %}
+
+{% endblock %}
