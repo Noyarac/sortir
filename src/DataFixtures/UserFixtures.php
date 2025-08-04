@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Campus;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -13,6 +14,9 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        $campusRepository = $manager->getRepository(Campus::class);
+        $allCampuses = $campusRepository->findAll();
+
         $faker = \Faker\Factory::create('fr_FR');
         $admin = new User();
         $prenom = $faker->firstName;
@@ -24,6 +28,7 @@ class UserFixtures extends Fixture
         $password = $this->passwordHasher->hashPassword($admin, '123456');
         $admin->setPassword($password);
         $admin->setRoles(['ROLE_ADMIN']);
+        $admin->setCampus($faker->randomElement($allCampuses));
         $manager->persist($admin);
 
         //création d'utilisateur avec le rôle USER
@@ -37,8 +42,17 @@ class UserFixtures extends Fixture
             $user->setPseudo(strtolower($prenom).' - '.strtolower($nom));
             $password = $this->passwordHasher->hashPassword($user, '123456');
             $user->setPassword($password);
+            $user->setCampus($faker->randomElement($allCampuses));
             $manager->persist($user);
         }
         $manager->flush();
     }
+
+    public function getDependencies()
+    {
+        return [
+            CampusFixtures::class,
+        ];
+    }
+
 }

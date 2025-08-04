@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Campus;
 use App\Entity\Sortie;
 use DateInterval;
 use DateTime;
@@ -14,6 +15,8 @@ class SortieFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $faker = \Faker\Factory::create("fr_FR");
+        $campusRepository = $manager->getRepository(Campus::class);
+        $allCampuses = $campusRepository->findAll();
 
         for ($i = 0; $i < 30; $i++) {
             $sortie = new Sortie;
@@ -25,8 +28,16 @@ class SortieFixtures extends Fixture
             $sortie->setNbInscriptionMax($faker->optional(90)->numberBetween(5, 30));
             $sortie->setInfosSortie($faker->sentence());
             $sortie->setEtat("EC");
+            $sortie->setCampus($faker->randomElement($allCampuses));
             $manager->persist($sortie);
         }
         $manager->flush();
+    }
+
+    public function getDependencies()
+    {
+        return [
+            CampusFixtures::class,
+        ];
     }
 }
