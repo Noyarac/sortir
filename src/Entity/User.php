@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -20,6 +21,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank(message:"Veuillez indiquer votre adresse mail")]
+    #[Assert\Assert\Email(message: "Veuillez entrer une adresse mail valide")]
     private ?string $email = null;
 
     /**
@@ -35,14 +38,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message:"Veuillez indiquer votre nom")]
+    #[Assert\Assert\Length(min: 2, max: 50, minMessage: 'Le nom doit comporter au moins 2 caractères',
+    maxMessage:'Le nom doit comporter au maximum 50 caractères')]
     private ?string $nom = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message:"Veuillez indiquer votre prénom")]
+    #[Assert\Assert\Length(min: 2, max: 50, minMessage: 'Le prénom doit comporter au moins 2 caractères',
+        maxMessage:'Le prénom doit comporter au maximum 50 caractères')]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message:"Veuillez indiquer votre pseudo")]
+    #[Assert\Assert\Length(min: 2, max: 50, minMessage: 'Le pseudo doit comporter au moins 2 caractères',
+        maxMessage:'Le pseudo doit comporter au maximum 50 caractères')]
     private ?string $pseudo = null;
 
+    #[Assert\NotBlank(message:"Veuillez indiquer votre numéro de téléphone")]
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $telephone = null;
 
