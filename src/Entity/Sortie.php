@@ -18,9 +18,6 @@ class Sortie
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
-    #[ORM\Column(type: Types::TIME_IMMUTABLE)]
-    private ?\DateTimeImmutable $dateHeureDebut = null;
-
     #[ORM\Column]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
 
@@ -35,6 +32,9 @@ class Sortie
 
     #[ORM\Column(nullable: true)]
     private ?int $duree = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $dateHeureDebut = null;
 
     public function getDuree() : ?int {
         return $this->duree;
@@ -58,18 +58,6 @@ class Sortie
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
-        return $this;
-    }
-
-    public function getDateHeureDebut(): ?\DateTimeImmutable
-    {
-        return $this->dateHeureDebut;
-    }
-
-    public function setDateHeureDebut(\DateTimeImmutable $dateHeureDebut): static
-    {
-        $this->dateHeureDebut = $dateHeureDebut;
 
         return $this;
     }
@@ -118,6 +106,18 @@ class Sortie
     public function setEtat(string $etat): static
     {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getDateHeureDebut(): ?\DateTimeImmutable
+    {
+        return $this->dateHeureDebut;
+    }
+
+    public function setDateHeureDebut(\DateTimeImmutable $dateHeureDebut): static
+    {
+        $this->dateHeureDebut = $dateHeureDebut;
 
         return $this;
     }

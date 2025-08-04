@@ -18,7 +18,7 @@ class SortieFixtures extends Fixture
         for ($i = 0; $i < 30; $i++) {
             $sortie = new Sortie;
             $sortie->setNom($faker->sentence());
-            $dateHeureDebut = new DateTime("-1 year");
+            $dateHeureDebut = $faker->dateTimeBetween("-1 year");;
             $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
             $sortie->setDuree($faker->numberBetween(15, 3 * 24 * 60));
             $sortie->setDateLimiteInscription($sortie->getDateHeureDebut()->sub(new DateInterval("P1D")));
@@ -26,9 +26,7 @@ class SortieFixtures extends Fixture
             $sortie->setInfosSortie($faker->sentence());
             $sortie->setEtat("EC");
             $manager->persist($sortie);
-
         }
-
         $manager->flush();
     }
 }
