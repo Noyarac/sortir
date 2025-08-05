@@ -5,18 +5,20 @@ namespace App\DataFixtures;
 use App\Entity\Campus;
 use App\Entity\Etat;
 use App\Entity\Sortie;
+use App\Entity\User;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class SortieFixtures extends Fixture
+class SortieFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
         $faker = \Faker\Factory::create("fr_FR");
-        $campusRepository = $manager->getRepository(Campus::class);
-        $allCampuses = $campusRepository->findAll();
+        $allCampuses = $manager->getRepository(Campus::class)->findAll();
+        $allUsers = $manager->getRepository(User::class)->findAll();
 
         for ($i = 0; $i < 100; $i++) {
             $sortie = new Sortie;
@@ -29,15 +31,20 @@ class SortieFixtures extends Fixture
             $sortie->setInfosSortie($faker->sentence());
             $sortie->setEtat($faker->randomElement(Etat::values()));
             $sortie->setCampus($faker->randomElement($allCampuses));
+            $sortie->setOrganisateur($faker->randomElement($allUsers));
+            for ($j = 0; $j < $sortie->getNbInscriptionMax(); $j++) {
+                if (rand(0, 100) < 8) $sortie->addParticipant($faker->randomElement($allUsers));
+            }
             $manager->persist($sortie);
         }
         $manager->flush();
     }
 
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
             CampusFixtures::class,
+            UserFixtures::class,
         ];
     }
 }
