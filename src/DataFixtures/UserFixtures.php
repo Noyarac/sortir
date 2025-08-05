@@ -11,6 +11,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture implements DependentFixtureInterface
 {
+    const USER_QUANTITY = 10;
+
     public function __construct(private readonly UserPasswordHasherInterface $passwordHasher){}
 
     public function load(ObjectManager $manager): void
@@ -33,7 +35,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         $manager->persist($admin);
 
         //création d'utilisateur avec le rôle USER
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= self::USER_QUANTITY; $i++) {
             $user = new User();
             $prenom = $faker->firstName;
             $nom = $faker->lastName;
@@ -49,7 +51,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         $manager->flush();
     }
 
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
             CampusFixtures::class,
