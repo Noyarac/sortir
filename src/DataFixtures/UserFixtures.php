@@ -19,7 +19,6 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
     {
         $campusRepository = $manager->getRepository(Campus::class);
         $allCampuses = $campusRepository->findAll();
-
         $faker = \Faker\Factory::create('fr_FR');
         $admin = new User();
         $prenom = $faker->firstName;
@@ -39,10 +38,17 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $user = new User();
             $prenom = $faker->firstName;
             $nom = $faker->lastName;
+            //Suppression des accents et mise en minuscules pour le main
+            $prenomClean = strtolower((string)iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $prenom));
+            $nomClean = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nom));
             $user->setNom($nom);
             $user->setPrenom($prenom);
-            $user->setEmail(strtolower($prenom).'.'.strtolower($nom).'@eni.fr');
+            $user->setEmail($prenomClean.'.'.$nomClean.'@eni.fr');
             $user->setPseudo(strtolower($prenom).ucfirst($nom));
+            $numeroTelephone = $faker->optional(80)->numerify('06########');
+            if($numeroTelephone){
+                $user->setTelephone($numeroTelephone);
+            }
             $password = $this->passwordHasher->hashPassword($user, 'Mdp*123456');
             $user->setPassword($password);
             $user->setCampus($faker->randomElement($allCampuses));

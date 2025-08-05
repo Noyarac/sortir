@@ -15,7 +15,7 @@
             {% include '_navbar.html.twig' %}
         </header>
         <main>
-            {% if app.request.attributes.get('route')!='app_login' %}
+            {% if app.user and app.request.attributes.get('route')!='app_login' %}
             <div class="d-flex justify-content-end mt-2 px-2">
                 <div class="card shadow-sm">
                     <div class="card-body">
