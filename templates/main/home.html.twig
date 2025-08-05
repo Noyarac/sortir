@@ -1,11 +1,45 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil provisoire!{% endblock %}
+{# {% block title %}Sorties pour {{campus.nom}}{% endblock %} #}
 
 {% block body %}
-    {% if app.user %}
-        <h1>Bonjour {{ app.user.pseudo }}</h1>
-    {% else %}
-        <h1>Aucun utilisateur connecté</h1>
-    {% endif %}
-{% endblock %}
+	<h2>Accueil</h2>
+    <h5>Filtrer les sorties</h5>
+	{{ form(campusForm, {'attr': {'data-turbo-frame': 'sorties-results-frame'}})}}
+		<turbo-frame id="sorties-results-frame">
+            {% if sorties is not empty %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date</th>
+                            <th>Cloture</th>
+                            <th>Inscrits</th>
+                            <th>Etat</th>
+                            <th>Inscrit</th>
+                            <th>Organisateur</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sortie in sorties %}
+                            <tr>
+                                <td>{{ sortie.nom}}</td>
+                                <td>{{ sortie.dateHeureDebut | date("d/m/Y")}}</td>
+                                <td>{{ sortie.dateLimiteInscription | date("d/m/Y")}}</td>
+                                <td>{{ sortie.nbInscriptionMax}}</td>
+                                <td>{{ sortie.etat}}</td>
+                                <td>{{ sortie.nom}}</td>
+                                <td>{{ sortie.nom}}</td>
+                                <td>{{ sortie.nom}}</td>
+                            </tr>
+                    {% endfor %}
+            {% else %}
+                <div>Il n'y a pas de sorties.</div>
+            {% endif %}
+				</tbody>
+			</table>
+		</turbo-frame>
+
+
+	{% endblock %}
