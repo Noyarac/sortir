@@ -30,7 +30,7 @@
                         <td>{{sortie.participants | length }}{{sortie.nbInscriptionMax ? " / " : ""}}{{sortie.nbInscriptionMax}}</td>
                         <td>{{ sortie.etat|replace({'_': ' '})|capitalize}}</td>
                         <td>{{app.user in sortie.participants ? "✔" : ""}}</td>
-                        <td>{{ sortie.organisateur.pseudo}}</td>
+                        <td><a href="{{ path('profil_afficher', {'id': sortie.organisateur.id}) }}" data-turbo="false">{{ sortie.organisateur.pseudo}}</a></td>
                         <td></td>
                     </tr>
                 {% endfor %}
