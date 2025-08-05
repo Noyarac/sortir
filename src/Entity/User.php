@@ -26,7 +26,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     /**
-     * @var list<string> The user roles
+     * @var list<string> The profil roles
      */
     #[ORM\Column]
     private array $roles = [];
@@ -98,7 +98,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * A visual identifier that represents this user.
+     * A visual identifier that represents this profil.
      *
      * @see UserInterface
      */

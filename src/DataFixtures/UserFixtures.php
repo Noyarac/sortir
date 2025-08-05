@@ -24,8 +24,8 @@ class UserFixtures extends Fixture
         $admin->setNom($nom);
         $admin->setPrenom($prenom);
         $admin->setEmail('admin@eni.fr');
-        $admin->setPseudo('admin-'.strtolower($prenom));
-        $password = $this->passwordHasher->hashPassword($admin, '123456');
+        $admin->setPseudo('admin'.ucfirst($prenom));
+        $password = $this->passwordHasher->hashPassword($admin, 'Mdp*123456');
         $admin->setPassword($password);
         $admin->setRoles(['ROLE_ADMIN']);
         $admin->setCampus($faker->randomElement($allCampuses));
@@ -39,8 +39,8 @@ class UserFixtures extends Fixture
             $user->setNom($nom);
             $user->setPrenom($prenom);
             $user->setEmail(strtolower($prenom).'.'.strtolower($nom).'@eni.fr');
-            $user->setPseudo(strtolower($prenom).' - '.strtolower($nom));
-            $password = $this->passwordHasher->hashPassword($user, '123456');
+            $user->setPseudo(strtolower($prenom).ucfirst($nom));
+            $password = $this->passwordHasher->hashPassword($user, 'Mdp*123456');
             $user->setPassword($password);
             $user->setCampus($faker->randomElement($allCampuses));
             $manager->persist($user);
