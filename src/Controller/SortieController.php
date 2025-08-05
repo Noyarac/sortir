@@ -2,22 +2,29 @@
 
 namespace App\Controller;
 
-use App\Entity\Campus;
+use App\Form\CampusType;
 use App\Repository\SortieRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route("/sortie")]
 final class SortieController extends AbstractController
 {
-    #[Route('/{id}', name: 'sortie_list')]
-    public function getSortiesListByCampus(Campus $campus, SortieRepository $sortieRepository): Response
+    #[Route('/', name: 'sortie_list', methods: ["GET", "POST"])]
+    public function getSortiesListByCampus(Request $request, SortieRepository $sortieRepository): Response
     {
-        $sorties = $sortieRepository->findBy(["campus" => $campus]);
+        $campusForm = $this->createForm(CampusType::class);
+        $campusForm->handleRequest($request);
+        if ($campusForm->isSubmitted() && $campusForm->isValid()) {
+            $campus = $campusForm->get("campus")->getData();
+            $sorties = $sortieRepository->findBy(["campus" => $campus]);
+        } else {
+            $sorties = [];
+        }
         return $this->render('sortie/list.html.twig', [
-            "campus" => $campus,
+            "campusForm" => $campusForm,
             "sorties" => $sorties,
         ]);
     }
