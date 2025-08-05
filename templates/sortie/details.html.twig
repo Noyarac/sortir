@@ -1,8 +1,78 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<h2>Afficher une sortie</h2>
-
+	<div class="container">
+        <h3 class="ms-4">Afficher une sortie</h3>
+        <dl class="dlStyle">
+            <div>
+                    <div>
+                        <dt>Nom</dt>
+                        <dd>{{sortie.nom}}</dd>
+                    </div>
+                    <div>
+                        <dt>Date et heure</dt>
+                        <dd>{{sortie.dateHeureDebut | date("d/m/Y H:i")}}</dd>
+                    </div>
+                    <div>
+                        <dt>Date limite d'inscription</dt>
+                        <dd>{{sortie.dateLimiteInscription | date("d/m/Y")}}</dd>
+                    </div>
+                    <div>
+                        <dt>Nombre de places</dt>
+                        <dd>{{sortie.nbInscriptionMax}}</dd>
+                    </div>
+                    <div>
+                        <dt>Durée (en min)</dt>
+                        <dd>{{sortie.duree}}
+                            min</dd>
+                    </div>
+                </div>
+            <div>
+                    <div>
+                        <dt>Campus</dt>
+                        <dd>{{sortie.campus.nom}}</dd>
+                    </div>
+                    <div>
+                        <dt>Ville</dt>
+                        <dd>todo</dd>
+                    </div>
+                    <div>
+                        <dt>Lieu</dt>
+                        <dd>todo</dd>
+                    </div>
+                    <div>
+                        <dt>Rue</dt>
+                        <dd>todo</dd>
+                    </div>
+                    <div>
+                        <dt>Code postal</dt>
+                        <dd>todo</dd>
+                    </div>
+                    <div>
+                        <dt>Latitude - Longitude</dt>
+                        <dd>todo</dd>
+                    </div>
+                </div>
+            <div>
+                <div>
+                        <dt>Description</dt>
+                        <dd>{{sortie.infosSortie}}</dd>
+                    </div>
+            </div>
+            <div>
+                <div>
+                        <dt>Liste des participants inscrits</dt>
+                        <dd>
+                            <ul>
+                                {% for user in sortie.participants %}
+                                    <li>{{user.nom}}</li>
+                                {% endfor %}
+                            </ul>
+                        </dd>
+                    </div>
+            </div>
+        </dl>
+    </div>
 {% endblock %}
 
-{% block title %}{% endblock %}
+{% block title %}Détail d'une sortie | {{parent()}} {% endblock %}
