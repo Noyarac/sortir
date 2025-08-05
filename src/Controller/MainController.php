@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Form\CampusType;
+use App\Form\FiltreSortiesType;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,16 +14,16 @@ final class MainController extends AbstractController
     #[Route('/', name: 'main_home', methods: ["GET", "POST"])]
     public function home(Request $request, SortieRepository $sortieRepository): Response
     {
-        $campusForm = $this->createForm(CampusType::class);
-        $campusForm->handleRequest($request);
-        if ($campusForm->isSubmitted() && $campusForm->isValid()) {
-            $campus = $campusForm->get("campus")->getData();
+        $filtreForm = $this->createForm(FiltreSortiesType::class);
+        $filtreForm->handleRequest($request);
+        if ($filtreForm->isSubmitted() && $filtreForm->isValid()) {
+            $campus = $filtreForm->get("campus")->getData();
             $sorties = $sortieRepository->findBy(["campus" => $campus]);
         } else {
             $sorties = [];
         }
         return $this->render('main/home.html.twig', [
-            "campusForm" => $campusForm,
+            "filtreForm" => $filtreForm,
             "sorties" => $sorties,
         ]);
     }
