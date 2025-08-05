@@ -8,6 +8,7 @@
 	{{ form(campusForm, {'attr': {'data-turbo-frame': 'sorties-results-frame','class':'leftForm'}})}}
 		<turbo-frame id="sorties-results-frame">
             {% if sorties is not empty %}
+            <table>
                 <thead>
                     <tr>
                         <th>Nom</th>
@@ -33,12 +34,10 @@
                         <td></td>
                     </tr>
                 {% endfor %}
+                </tbody>
+            </table>
             {% else %}
                 <div>Il n'y a pas de sorties.</div>
             {% endif %}
-				</tbody>
-			</table>
 		</turbo-frame>
-
-
 	{% endblock %}
