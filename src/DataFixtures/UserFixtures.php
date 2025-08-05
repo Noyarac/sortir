@@ -39,12 +39,13 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $prenom = $faker->firstName;
             $nom = $faker->lastName;
             //Suppression des accents et mise en minuscules pour le main
-            $prenomClean = strtolower((string)iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $prenom));
-            $nomClean = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nom));
+            $prenomClean = strtolower(preg_replace('/[^A-Za-z]/', '', iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $prenom)));
+            $nomClean = strtolower(preg_replace('/[^A-Za-z]/', '', iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nom)));
+
             $user->setNom($nom);
             $user->setPrenom($prenom);
             $user->setEmail($prenomClean.'.'.$nomClean.'@eni.fr');
-            $user->setPseudo(strtolower($prenom).ucfirst($nom));
+            $user->setPseudo($prenomClean.ucfirst($nomClean));
             $numeroTelephone = $faker->optional(80)->numerify('06########');
             if($numeroTelephone){
                 $user->setTelephone($numeroTelephone);
