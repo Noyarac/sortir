@@ -3,25 +3,27 @@
 {% block title %}{{ parent() }} | Profil{% endblock %}
 
 {% block body %}
-    <h2>{{ user.pseudo }}</h2>
-    <div class="d-flex justify-content-center m-5">
-        <div class="col-10 col-lg-5">
-            <dl class="row">
-                <dt class="col-lg-4 text-secondary">Campus</dt>
-                <dd class="col-lg-8">{{ user.campus.nom }}</dd>
+    <div class="container">
+        <h3 class="ms-4">{{ user.pseudo }}</h3>
+        <dl class="dlStyle">
+            <div>
+                <div>
+                    <dt>Campus</dt>
+                    <dd>{{ user.campus.nom }}</dd>
 
-                <dt class="col-lg-4 text-secondary">Prénom</dt>
-                <dd class="col-lg-8">{{user.prenom}}</dd>
+                    <dt>Prénom</dt>
+                    <dd>{{user.prenom}}</dd>
 
-                <dt class="col-lg-4 text-secondary">Nom</dt>
-                <dd class="col-lg-8">{{user.nom}}</dd>
+                    <dt>Nom</dt>
+                    <dd>{{user.nom}}</dd>
 
-                <dt class="col-lg-4 text-secondary">Téléphone</dt>
-                <dd class="col-lg-8">{{user.telephone | split('') | batch(2) | map(nombres => nombres|join) | join(' ')}}</dd>
+                    <dt>Téléphone</dt>
+                    <dd>{{user.telephone ? (user.telephone | split('') | batch(2) | map(nombres => nombres|join) | join(' ')) : 'Non Renseigné' }}</dd>
 
-                <dt class="col-lg-4 text-secondary">Email</dt>
-                <dd class="col-lg-8">{{user.email}}</dd>
-            </dl>
-        </div>
+                    <dt>Email</dt>
+                    <dd>{{user.email}}</dd>
+                </div>
+            </div>
+        </dl>
     </div>
 {% endblock %}
