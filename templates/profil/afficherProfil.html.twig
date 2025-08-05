@@ -10,16 +10,20 @@
                 <div>
                     <dt>Campus</dt>
                     <dd>{{ user.campus.nom }}</dd>
-
+                </div>
+                <div>
                     <dt>Prénom</dt>
                     <dd>{{user.prenom}}</dd>
-
+                </div>
+                <div>
                     <dt>Nom</dt>
                     <dd>{{user.nom}}</dd>
-
+                </div>
+                <div>
                     <dt>Téléphone</dt>
                     <dd>{{user.telephone ? (user.telephone | split('') | batch(2) | map(nombres => nombres|join) | join(' ')) : 'Non Renseigné' }}</dd>
-
+                </div>
+                <div>
                     <dt>Email</dt>
                     <dd>{{user.email}}</dd>
                 </div>

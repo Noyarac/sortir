@@ -3,9 +3,11 @@
 {% block title %}{{ parent() }} | Mon profil{% endblock %}
 
 {% block body %}
+    <div class="container">
     <h3 class="ms-4">Mon Profil</h3>
     {{ form_start(userForm) }}
     {{ form_widget(userForm) }}
     <button type="submit" class="btn btn-primary">Enregistrer</button>
     {{ form_end(userForm) }}
+    </div>
 {% endblock %}
