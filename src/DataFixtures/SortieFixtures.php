@@ -3,9 +3,9 @@
 namespace App\DataFixtures;
 
 use App\Entity\Campus;
+use App\Entity\Etat;
 use App\Entity\Sortie;
 use DateInterval;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -18,7 +18,7 @@ class SortieFixtures extends Fixture
         $campusRepository = $manager->getRepository(Campus::class);
         $allCampuses = $campusRepository->findAll();
 
-        for ($i = 0; $i < 30; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $sortie = new Sortie;
             $sortie->setNom($faker->sentence());
             $dateHeureDebut = $faker->dateTimeBetween("-1 year");;
@@ -27,7 +27,7 @@ class SortieFixtures extends Fixture
             $sortie->setDateLimiteInscription($sortie->getDateHeureDebut()->sub(new DateInterval("P1D")));
             $sortie->setNbInscriptionMax($faker->optional(90)->numberBetween(5, 30));
             $sortie->setInfosSortie($faker->sentence());
-            $sortie->setEtat("EC");
+            $sortie->setEtat($faker->randomElement(Etat::values()));
             $sortie->setCampus($faker->randomElement($allCampuses));
             $manager->persist($sortie);
         }
