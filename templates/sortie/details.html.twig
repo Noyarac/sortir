@@ -65,7 +65,7 @@
                         <dd>
                             <ul>
                                 {% for user in sortie.participants %}
-                                    <li>{{user.nom}}</li>
+                                    <li><a href="{{ path('profil_afficher', parameters: {id: user.id}) }}">{{user.nom}}</a></li>
                                 {% endfor %}
                             </ul>
                         </dd>
