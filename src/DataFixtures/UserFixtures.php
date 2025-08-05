@@ -19,7 +19,6 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
     {
         $campusRepository = $manager->getRepository(Campus::class);
         $allCampuses = $campusRepository->findAll();
-
         $faker = \Faker\Factory::create('fr_FR');
         $admin = new User();
         $prenom = $faker->firstName;
@@ -27,8 +26,8 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         $admin->setNom($nom);
         $admin->setPrenom($prenom);
         $admin->setEmail('admin@eni.fr');
-        $admin->setPseudo('admin-'.strtolower($prenom));
-        $password = $this->passwordHasher->hashPassword($admin, '123456');
+        $admin->setPseudo('admin'.ucfirst($prenom));
+        $password = $this->passwordHasher->hashPassword($admin, 'Mdp*123456');
         $admin->setPassword($password);
         $admin->setRoles(['ROLE_ADMIN']);
         $admin->setCampus($faker->randomElement($allCampuses));
@@ -39,11 +38,19 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $user = new User();
             $prenom = $faker->firstName;
             $nom = $faker->lastName;
+            //Suppression des accents et mise en minuscules pour le main
+            $prenomClean = strtolower(preg_replace('/[^A-Za-z]/', '', iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $prenom)));
+            $nomClean = strtolower(preg_replace('/[^A-Za-z]/', '', iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nom)));
+
             $user->setNom($nom);
             $user->setPrenom($prenom);
-            $user->setEmail(strtolower($prenom).'.'.strtolower($nom).'@eni.fr');
-            $user->setPseudo(strtolower($prenom).' - '.strtolower($nom));
-            $password = $this->passwordHasher->hashPassword($user, '123456');
+            $user->setEmail($prenomClean.'.'.$nomClean.'@eni.fr');
+            $user->setPseudo($prenomClean.ucfirst($nomClean));
+            $numeroTelephone = $faker->optional(80)->numerify('06########');
+            if($numeroTelephone){
+                $user->setTelephone($numeroTelephone);
+            }
+            $password = $this->passwordHasher->hashPassword($user, 'Mdp*123456');
             $user->setPassword($password);
             $user->setCampus($faker->randomElement($allCampuses));
             $manager->persist($user);

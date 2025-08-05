@@ -9,11 +9,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: 'pseudo', message: 'Ce pseudo est déjà utilisé')]
 #[UniqueEntity(fields : 'email', message : 'Cette adresse mail est déjà utilisée')]
+#[UniqueEntity(fields : 'telephone', message : 'Ce numero de téléphone est déjà utilisé')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -22,10 +24,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank(message:"Veuillez indiquer votre adresse mail")]
+    #[Assert\Email(message: "Veuillez entrer une adresse mail valide")]
     private ?string $email = null;
 
     /**
-     * @var list<string> The user roles
+     * @var list<string> The profil roles
      */
     #[ORM\Column]
     private array $roles = [];
@@ -37,14 +41,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message:"Veuillez indiquer votre nom")]
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Le nom doit comporter au moins 2 caractères',
+    maxMessage:'Le nom doit comporter au maximum 50 caractères')]
     private ?string $nom = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message:"Veuillez indiquer votre prénom")]
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Le prénom doit comporter au moins 2 caractères',
+        maxMessage:'Le prénom doit comporter au maximum 50 caractères')]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message:"Veuillez indiquer votre pseudo")]
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Le pseudo doit comporter au moins 2 caractères',
+        maxMessage:'Le pseudo doit comporter au maximum 50 caractères')]
     private ?string $pseudo = null;
 
+
+    #[Assert\Regex([
+        'pattern'=>"/^(0[67])([ .]?\d{2}){4}$/",
+        'message'=>"Oops! le format du numéro ne semble pas valide. Le numéro de téléphone doit commencer par 06 ou 07. Les chiffres peuvent être séparés par un espace ou un point."])]
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $telephone = null;
 
@@ -98,7 +115,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * A visual identifier that represents this user.
+     * A visual identifier that represents this profil.
      *
      * @see UserInterface
      */
@@ -202,7 +219,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setTelephone(?string $telephone): static
     {
-        $this->telephone = $telephone;
+        //retrait des points et espaces du numéro de téléphone
+        $telephoneNormalise = str_replace([".", " "],"", $telephone);
+        $this->telephone = $telephoneNormalise;
 
         return $this;
     }
