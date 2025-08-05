@@ -3,5 +3,8 @@
 {% block title %}{{ parent() }} | Mon profil{% endblock %}
 
 {% block body %}
-
+    {{ form_start(userForm) }}
+    {{ form_widget(userForm) }}
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    {{ form_end(userForm) }}
 {% endblock %}

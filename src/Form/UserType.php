@@ -27,7 +27,7 @@ class UserType extends AbstractType
                 'choice_label' => 'nom',
                 'expanded' => false,
                 'multiple' => false,
-                'disabled'=> !$options['isAdmin'],
+                'disabled'=> !$options['campusModifiable'],
             ])
             ->add('pseudo', TextType::class, [
                 'label' => 'Pseudo',
@@ -62,13 +62,10 @@ class UserType extends AbstractType
                         'message' => 'Veuillez choisir un mot de passe',
                     ]),
                     new Length([
-                        'min' => 8,
-                        'minMessage' => 'Votre mot de passe doit comporter au moins {{ limit }} caractères',
-                        // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),
                     new Regex([
-                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_-+={}[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
+                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={}\[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
                         'message' => "Le mot de passe doit comporter au minimum 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial : !@#$%^&*()_-+={}[]|:;/\"'<>,.?~"
                     ])
                 ]
@@ -80,6 +77,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'campusModifiable' => false,//valeur par défaut false : le campus n'est pas modifiable par un utilisateur
         ]);
     }
 }

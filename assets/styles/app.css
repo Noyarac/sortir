@@ -1,3 +1,9 @@
 main {
     padding: 0.5rem;
 }
+
+form{
+    padding-top: 1rem;
+    width: 50vw;
+    margin: 0 auto; /*formulaire centré horizontalement*/
+}
