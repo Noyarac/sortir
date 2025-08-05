@@ -12,7 +12,8 @@ enum Etat: string
     case ANNULEE = "annulee";
     case HISTORISEE = "historisee";
 
-    public static function values(): array {
+    public static function values(): array
+    {
         return array_map(fn($case) => $case->value, self::cases());
     }
 }

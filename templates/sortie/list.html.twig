@@ -25,11 +25,11 @@
                             <td>{{ sortie.nom}}</td>
                             <td>{{ sortie.dateHeureDebut | date("d/m/Y")}}</td>
                             <td>{{ sortie.dateLimiteInscription | date("d/m/Y")}}</td>
-                            <td>{{ sortie.nbInscriptionMax}}</td>
-                            <td>{{ sortie.etat}}</td>
-                            <td>{{ sortie.nom}}</td>
-                            <td>{{ sortie.nom}}</td>
-                            <td>{{ sortie.nom}}</td>
+                            <td>{{sortie.participants | length }}{{sortie.nbInscriptionMax ? " / " : ""}}{{sortie.nbInscriptionMax}}</td>
+                            <td>{{ sortie.etat|replace({'_': ' '})|capitalize}}</td>
+                            <td>{{app.user in sortie.participants ? "✔" : ""}}</td>
+                            <td>{{ sortie.organisateur.pseudo}}</td>
+                            <td></td>
                         </tr>
 					{% else %}
 						<div>Il n'y a pas de sorties.</div>

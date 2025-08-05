@@ -32,7 +32,8 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
             $sortie->setEtat($faker->randomElement(Etat::values()));
             $sortie->setCampus($faker->randomElement($allCampuses));
             $sortie->setOrganisateur($faker->randomElement($allUsers));
-            for ($j = 0; $j < $sortie->getNbInscriptionMax(); $j++) {
+            $max = $sortie->getNbInscriptionMax() ?: 100;
+            for ($j = 0; $j < $max; $j++) {
                 if (rand(0, 100) < 8) $sortie->addParticipant($faker->randomElement($allUsers));
             }
             $manager->persist($sortie);
