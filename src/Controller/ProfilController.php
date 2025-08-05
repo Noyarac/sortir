@@ -8,12 +8,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 #[Route('/profil')]
 final class ProfilController extends AbstractController
 {
     #[Route('/modifier', name: 'profil_modifier', methods: ['GET','POST'])]
-    public function modifierProfil(Request $request, EntityManagerInterface $entityManager): Response
+    public function modifierProfil(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $this->getUser();
         //Inutile de vérifier que $user existe car application entièrement protégée et seulement accessible à ROLE_USER
@@ -24,6 +25,11 @@ final class ProfilController extends AbstractController
         $userForm->handleRequest($request);
 
         if ($userForm->isSubmitted() && $userForm->isValid()) {
+            $plainPassword = $userForm->get('plainPassword')->getData();
+            if($plainPassword){
+                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+                $user->setPassword($hashedPassword);
+            }
             $entityManager->flush();
             $this->addFlash('success', 'Profil mis à jour avec succès!');
             return $this->redirectToRoute('main_home');

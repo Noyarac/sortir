@@ -5,25 +5,23 @@
 {% block body %}
     <h2>{{ user.pseudo }}</h2>
     <div class="d-flex justify-content-center m-5">
-        <div class="card" style="width: 40vw; ">
-            <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Campus</dt>
-                    <dd class="col-sm-8">{{ user.campus.nom }}</dd>
+        <div class="col-10 col-lg-5">
+            <dl class="row">
+                <dt class="col-lg-4 text-secondary">Campus</dt>
+                <dd class="col-lg-8">{{ user.campus.nom }}</dd>
 
-                    <dt class="col-sm-4">Prénom</dt>
-                    <dd class="col-sm-8">{{user.prenom}}</dd>
+                <dt class="col-lg-4 text-secondary">Prénom</dt>
+                <dd class="col-lg-8">{{user.prenom}}</dd>
 
-                    <dt class="col-sm-4">Nom</dt>
-                    <dd class="col-sm-8">{{user.nom}}</dd>
+                <dt class="col-lg-4 text-secondary">Nom</dt>
+                <dd class="col-lg-8">{{user.nom}}</dd>
 
-                    <dt class="col-sm-4">Téléphone</dt>
-                    <dd class="col-sm-8">{{user.telephone | split('') | batch(2) | map(nombres => nombres|join) | join(' ')}}</dd>
+                <dt class="col-lg-4 text-secondary">Téléphone</dt>
+                <dd class="col-lg-8">{{user.telephone | split('') | batch(2) | map(nombres => nombres|join) | join(' ')}}</dd>
 
-                    <dt class="col-sm-4">Email</dt>
-                    <dd class="col-sm-8">{{user.email}}</dd>
-                </dl>
-            </div>
+                <dt class="col-lg-4 text-secondary">Email</dt>
+                <dd class="col-lg-8">{{user.email}}</dd>
+            </dl>
         </div>
     </div>
 {% endblock %}
