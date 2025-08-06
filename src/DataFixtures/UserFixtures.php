@@ -26,7 +26,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         $admin->setNom($nom);
         $admin->setPrenom($prenom);
         $admin->setEmail('admin@eni.fr');
-        $admin->setPseudo('admin'.ucfirst($prenom));
+        $admin->setPseudo('admin '.ucfirst($prenom));
         $password = $this->passwordHasher->hashPassword($admin, 'Mdp*123456');
         $admin->setPassword($password);
         $admin->setRoles(['ROLE_ADMIN']);
@@ -45,7 +45,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $user->setNom($nom);
             $user->setPrenom($prenom);
             $user->setEmail($prenomClean.'.'.$nomClean.'@eni.fr');
-            $user->setPseudo($prenomClean.ucfirst($nomClean));
+            $user->setPseudo($prenomClean.' '.$faker->optional(80)->numerify('##'));
             $numeroTelephone = $faker->optional(80)->numerify('06########');
             if($numeroTelephone){
                 $user->setTelephone($numeroTelephone);

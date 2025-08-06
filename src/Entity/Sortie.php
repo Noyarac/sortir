@@ -3,13 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\SortieRepository;
-use DateInterval;
+use App\Validator\DatesDebutEtLimiteInscription;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SortieRepository::class)]
+#[DatesDebutEtLimiteInscription]
 class Sortie
 {
     #[ORM\Id]
@@ -18,24 +20,37 @@ class Sortie
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Merci d'indiquer un nom pour cette sortie!" )]
+    #[Assert\Length(min: 1, max: 255, minMessage: "Merci de choisir un nom contenant au moins 3 caractères.",
+    maxMessage: "Maximum 255 caractères autorisés")]
     private ?string $nom = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "La date limite d'inscription est obligatoire")]
+    #[Assert\GreaterThan('today', message: "Il faut laisser le temps aux partcipants de s'inscrire! La date limite d'inscription doit au moins être fixée à demain")]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
+    #[Assert\NotNull(message: "Merci d'indiquer le nombre maximum de participants")]
+    #[Assert\Range(notInRangeMessage: "Le nombre maximum d'inscrits doit être compris entre 5 et 1000.", min: 5, max: 1000)]
     private ?int $nbInscriptionMax = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 1000)]
+    #[Assert\NotBlank(message : "N'oubliez pas de compléter la description. Elles est essentielle pour donner envie aux personnes de s'incrire!")]
+    #[Assert\Length(min: 5, max:1000, minMessage: "C'est un peu court, au moins 5 caractères requis",
+    maxMessage: "Maximum 1000 caractères autorisés")]
     private ?string $infosSortie = null;
 
     #[ORM\Column(length: 255)]
     private ?string $etat = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
+    #[Assert\NotNull(message: "Merci d'indiquer la durée")]
+    #[Assert\Range(notInRangeMessage: "La durée doit être comprise entre 15 minutes et 3 jours (4 320 minutes)", min: 5, max: 1000)]
     private ?int $duree = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "La date et l'heure de début sont obligatoires")]
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
@@ -51,6 +66,11 @@ class Sortie
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'participations')]
     private Collection $participants;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message:"Merci de choisir un lieu pour cette sortie")]
+    private ?Lieu $lieu = null;
 
     public function __construct()
     {
@@ -187,6 +207,18 @@ class Sortie
     public function removeParticipant(User $participant): static
     {
         $this->participants->removeElement($participant);
+
+        return $this;
+    }
+
+    public function getLieu(): ?Lieu
+    {
+        return $this->lieu;
+    }
+
+    public function setLieu(?Lieu $lieu): static
+    {
+        $this->lieu = $lieu;
 
         return $this;
     }
