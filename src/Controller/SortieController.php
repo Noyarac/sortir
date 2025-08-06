@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Sortie;
 use App\Form\CampusType;
+use App\Form\SortieType;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +24,16 @@ final class SortieController extends AbstractController
     #[Route('/creation', name: 'sortie_creation', requirements: ["id" => "\d+"])]
     public function creationSortie(Request $request): Response
     {
-        return $this->render('sortie/creation.html.twig', [
+        $sortie = new Sortie();
+        //Inutile de vérifier que $user existe car application entièrement protégée et seulement accessible à ROLE_USER
+        $user = $this->getUser();
+        $sortie->setOrganisateur($user);
+        $sortie->setCampus($user->getCampus());
 
+        $sortieForm = $this->createForm(SortieType::class, $sortie);
+
+        return $this->render('sortie/creation.html.twig', [
+            'sortieForm' => $sortieForm,
         ]);
     }
 

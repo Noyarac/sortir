@@ -4,77 +4,69 @@
 
 {% block body %}
 	<div class="container">
-        <h3 class="ms-4">Afficher une sortie</h3>
-        <dl class="dlStyle">
-            <div>
-                    <div>
-                        <dt>Nom</dt>
-                        <dd>{{sortie.nom}}</dd>
-                    </div>
-                    <div>
-                        <dt>Date et heure</dt>
-                        <dd>{{sortie.dateHeureDebut | date("d/m/Y H:i")}}</dd>
-                    </div>
-                    <div>
-                        <dt>Date limite d'inscription</dt>
-                        <dd>{{sortie.dateLimiteInscription | date("d/m/Y")}}</dd>
-                    </div>
-                    <div>
-                        <dt>Nombre de places</dt>
-                        <dd>{{sortie.nbInscriptionMax}}</dd>
-                    </div>
-                    <div>
-                        <dt>Durée (en min)</dt>
-                        <dd>{{sortie.duree}}
-                            min</dd>
-                    </div>
-                </div>
-            <div>
-                    <div>
-                        <dt>Campus</dt>
-                        <dd>{{sortie.campus.nom}}</dd>
-                    </div>
-                    <div>
-                        <dt>Ville</dt>
-                        <dd>todo</dd>
-                    </div>
-                    <div>
-                        <dt>Lieu</dt>
-                        <dd>todo</dd>
-                    </div>
-                    <div>
-                        <dt>Rue</dt>
-                        <dd>todo</dd>
-                    </div>
-                    <div>
-                        <dt>Code postal</dt>
-                        <dd>todo</dd>
-                    </div>
-                    <div>
-                        <dt>Latitude - Longitude</dt>
-                        <dd>todo</dd>
-                    </div>
-                </div>
-            <div>
-                <div>
-                        <dt>Description</dt>
-                        <dd>{{sortie.infosSortie}}</dd>
-                    </div>
+        <h3>Créer une sortie</h3>
+        {{ form_start(sortieForm) }}
+
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(sortieForm.nom) }}
+                {{ form_row(sortieForm.dateHeureDebut) }}
+                {{ form_row(sortieForm.dateLimiteInscription) }}
+                {{ form_row(sortieForm.nbInscriptionMax) }}
+                {{ form_row(sortieForm.duree) }}
             </div>
-            <div>
-                <div>
-                        <dt>Liste des participants inscrits</dt>
-                        <dd>
-                            <ul>
-                                {% for participant in sortie.participants %}
-                                    <li><a href="{{ path('profil_afficher', parameters: {id: participant.id}) }}">{{participant.pseudo}}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </dd>
-                    </div>
+            <div class="col-md-6">
+                {{ form_row(sortieForm.campus) }}
+                {{ form_row(sortieForm.lieu) }}
+                {{ form_row(sortieForm.ville) }}
+                {{ form_row(sortieForm.codePostal) }}
+                <div class="col-md-3">
+                    {{ form_row(sortieForm.latitude) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(sortieForm.longitude) }}
+                </div>
             </div>
-        </dl>
+            {{ form_row(sortieForm.infosSortie) }}
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" name="Enregistrer" class="btn btn-primary">Enregistrer</button>
+            <button type="submit" name="Publier" class="btn btn-success">Publier</button>
+            <a href="{{ path('main_home') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+
+        {{ form_end(sortieForm) }}
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const lieuSelect = document.getElementById('{{ sortieForm.lieu.vars.id }}');
+
+        lieuSelect.addEventListener('change', function() {
+        const lieuId = this.value;
+        if(!lieuId) {
+            // On nettoie les champs si aucun lieu n'est sélectionné
+            document.getElementById('{{ sortieForm.rue.vars.id }}').value = '';
+            document.getElementById('{{ sortieForm.ville.vars.id }}').value = '';
+            document.getElementById('{{ sortieForm.latitude.vars.id }}').value = '';
+            document.getElementById('{{ sortieForm.longitude.vars.id }}').value = '';
+            return;
+        }
+
+        fetch(`/lieu/${lieuId}`)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('{{ sortieForm.rue.vars.id }}').value = data.rue;
+                document.getElementById('{{ sortieForm.ville.vars.id }}').value = data.ville.nom;
+                document.getElementById('{{ sortieForm.latitude.vars.id }}').value = data.latitude;
+                document.getElementById('{{ sortieForm.longitude.vars.id }}').value = data.longitude;
+            })
+        });
+    });
+    </script>
 {% endblock %}
 
 

@@ -2,13 +2,6 @@ main {
     padding: 0.5rem;
 }
 
-
-form {
-    padding-top: 1rem;
-    width: 50vw;
-    margin-left: 1.5rem;
-}
-
 .dlStyle {
     box-sizing: border-box;
     color: rgb(33, 37, 41);
