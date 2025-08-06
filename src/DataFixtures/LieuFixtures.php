@@ -28,7 +28,7 @@ class LieuFixtures extends Fixture implements DependentFixtureInterface
             $lieu->setLatitude($faker->latitude());
             $lieu->setLongitude($faker->longitude());
             $this->addReference('lieu'.$i, $lieu);
-            $lieu->$manager->persist($lieu);
+            $manager->persist($lieu);
         }
 
         $manager->flush();
