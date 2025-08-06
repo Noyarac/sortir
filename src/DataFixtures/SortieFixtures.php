@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Campus;
 use App\Entity\Etat;
+use App\Entity\Lieu;
 use App\Entity\Sortie;
 use App\Entity\User;
 use DateInterval;
@@ -36,6 +37,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
             for ($j = 0; $j < $max; $j++) {
                 if (rand(0, 100) < 8) $sortie->addParticipant($faker->randomElement($allUsers));
             }
+            $sortie->setLieu($this->getReference('lieu'.$faker->numberBetween(1,20), Lieu::class));
             $manager->persist($sortie);
         }
         $manager->flush();
@@ -46,6 +48,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
         return [
             CampusFixtures::class,
             UserFixtures::class,
+            LieuFixtures::class
         ];
     }
 }
