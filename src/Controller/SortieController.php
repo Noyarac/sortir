@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[Route("/sortie")]
 final class SortieController extends AbstractController
 {
-    #[Route('/{id}', name: 'sortie_details', requirements: ["id" => "\d+"])]
+    #[Route('/{id}', name: 'sortie_details', requirements: ["id" => "\d+"], methods: ["GET"])]
     public function details(Sortie $sortie): Response
     {
         return $this->render('sortie/details.html.twig', [
@@ -21,7 +21,7 @@ final class SortieController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/inscription', name: 'sortie_inscription', requirements: ["id" => "\d+"])]
+    #[Route('/{id}/inscription', name: 'sortie_inscription', requirements: ["id" => "\d+"], methods: ["POST"])]
     public function inscription(Sortie $sortie, UserInterface $user, EntityManagerInterface $em): Response
     {
         if (!$this->isGranted(SortieVoter::INSCRIPTION, $sortie)) {
@@ -35,7 +35,7 @@ final class SortieController extends AbstractController
         return $this->redirectToRoute("main_home");
     }
 
-    #[Route('/{id}/desistement', name: 'sortie_desistement', requirements: ["id" => "\d+"])]
+    #[Route('/{id}/desistement', name: 'sortie_desistement', requirements: ["id" => "\d+"], methods: ["POST"])]
     public function desistement(Sortie $sortie, UserInterface $user, EntityManagerInterface $em): Response
     {
         if (!$this->isGranted(SortieVoter::DESISTEMENT, $sortie)) {
