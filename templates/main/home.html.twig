@@ -5,8 +5,7 @@
 {% block body %}
     <div class="container">
         <h5 class="ms-4">Filtrer les sorties</h5>
-            {{ form(filtreForm, {'attr': {'data-turbo-frame': 'sorties-results-frame'}})}}
-                <turbo-frame id="sorties-results-frame">
+            {{ form(filtreForm, {'attr': {'data-turbo': 'false'}})}}
                 {% if sorties is not empty %}
                 <table class="table">
                     <thead>
@@ -50,6 +49,5 @@
                 {% else %}
                     <div>Il n'y a pas de sorties.</div>
                 {% endif %}
-                </turbo-frame>
     </div>
 	{% endblock %}
