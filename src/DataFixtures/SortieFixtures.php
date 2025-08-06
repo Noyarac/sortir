@@ -28,7 +28,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
             $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
             $sortie->setDuree($faker->numberBetween(15, 3 * 24 * 60));
             $sortie->setDateLimiteInscription($sortie->getDateHeureDebut()->sub(new DateInterval("P1D")));
-            $sortie->setNbInscriptionMax($faker->optional(90)->numberBetween(5, 30));
+            $sortie->setNbInscriptionMax($faker->numberBetween(5, 30));
             $sortie->setInfosSortie($faker->sentence());
             $sortie->setEtat($faker->randomElement(Etat::values()));
             $sortie->setCampus($faker->randomElement($allCampuses));
