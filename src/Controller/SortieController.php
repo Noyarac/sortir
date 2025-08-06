@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Sortie;
+use App\Form\FiltreSortiesType;
 use App\Security\Voter\SortieVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +27,7 @@ final class SortieController extends AbstractController
     {
         if (!$this->isGranted(SortieVoter::INSCRIPTION, $sortie)) {
             $this->addFlash("danger", "Il n'est pas possible de s'inscrire à cette sortie");
-            $this->redirectToRoute("main_home");
+            return $this->redirectToRoute("main_home");
         }
         $sortie->addParticipant($user);
         $em->persist($sortie);
@@ -40,7 +41,7 @@ final class SortieController extends AbstractController
     {
         if (!$this->isGranted(SortieVoter::DESISTEMENT, $sortie)) {
             $this->addFlash("danger", "Il n'est pas possible de se désister de cette sortie");
-            $this->redirectToRoute("main_home");
+            return $this->redirectToRoute("main_home");
         }
         $sortie->removeParticipant($user);
         $em->persist($sortie);
