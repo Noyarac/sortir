@@ -20,11 +20,14 @@
                 {{ form_row(sortieForm.lieu) }}
                 {{ form_row(sortieForm.ville) }}
                 {{ form_row(sortieForm.codePostal) }}
-                <div class="col-md-3">
-                    {{ form_row(sortieForm.latitude) }}
-                </div>
-                <div class="col-md-3">
-                    {{ form_row(sortieForm.longitude) }}
+                {{ form_row(sortieForm.rue) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(sortieForm.latitude) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(sortieForm.longitude) }}
+                    </div>
                 </div>
             </div>
             {{ form_row(sortieForm.infosSortie) }}
