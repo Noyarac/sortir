@@ -26,13 +26,30 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/{id}/inscription', name: 'sortie_inscription', requirements: ["id" => "\d+"])]
-    #[IsGranted(SortieVoter::INSCRIPTION, 'sortie')]
     public function inscription(Sortie $sortie, UserInterface $user, EntityManagerInterface $em): Response
     {
+        if (!$this->isGranted(SortieVoter::INSCRIPTION, $sortie)) {
+            $this->addFlash("danger", "Il n'est pas possible de s'inscrire à cette sortie");
+            $this->redirectToRoute("main_home");
+        }
         $sortie->addParticipant($user);
         $em->persist($sortie);
         $em->flush();
-        dd($sortie);
+        $this->addFlash("success", "Vous vous êtes inscrit(e) avec succès.");
+        return $this->redirectToRoute("main_home");
+    }
+
+    #[Route('/{id}/desistement', name: 'sortie_desistement', requirements: ["id" => "\d+"])]
+    public function desistement(Sortie $sortie, UserInterface $user, EntityManagerInterface $em): Response
+    {
+        if (!$this->isGranted(SortieVoter::DESISTEMENT, $sortie)) {
+            $this->addFlash("danger", "Il n'est pas possible de se désister de cette sortie");
+            $this->redirectToRoute("main_home");
+        }
+        $sortie->removeParticipant($user);
+        $em->persist($sortie);
+        $em->flush();
+        $this->addFlash("succes", "Vous vous êtes désisté(e) avec succès.");
         return $this->redirectToRoute("main_home");
     }
 
