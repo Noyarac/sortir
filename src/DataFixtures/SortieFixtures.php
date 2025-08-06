@@ -15,14 +15,26 @@ use Doctrine\Persistence\ObjectManager;
 
 class SortieFixtures extends Fixture implements DependentFixtureInterface
 {
+    const QTE_SORTIE = 100;
+    const REPARTITION = [
+        Etat::EN_CREATION->value => 1,
+        Etat::OUVERTE->value => 3,
+        Etat::CLOTUREE->value => 1,
+        Etat::EN_COURS->value => 1,
+        Etat::TERMINEE->value => 5,
+        Etat::ANNULEE->value => 1,
+        Etat::HISTORISEE->value => 10
+    ];
+
     public function load(ObjectManager $manager): void
     {
+
         $faker = \Faker\Factory::create("fr_FR");
         $allCampuses = $manager->getRepository(Campus::class)->findAll();
         $allUsers = $manager->getRepository(User::class)->findAll();
         $allSorties = [];
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < self::QTE_SORTIE; $i++) {
             $sortie = new Sortie;
             $sortie->setNom($faker->catchPhrase());
             $sortie->setDuree($faker->numberBetween(15, 3 * 24 * 60));
@@ -34,15 +46,15 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
             $allSorties[] = $sortie;
         }
         foreach ($allSorties as $sortie) {
-            $random = rand(0,100);
+            $random = rand(0, array_sum(self::REPARTITION));
             switch (true) {
-                case $random < 15:
+                case $random < self::seuil(Etat::EN_CREATION):
                     $sortie->setEtat(Etat::EN_CREATION->value);
                     $dateHeureDebut = $faker->dateTimeBetween("1 week", "1 year");;
                     $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
                     $sortie->setDateLimiteInscription($sortie->getDateHeureDebut()->sub(new DateInterval("P1D")));
                     break;
-                case $random < 30:
+                case $random < self::seuil(Etat::OUVERTE):
                     $sortie->setEtat(Etat::OUVERTE->value);
                     $dateHeureDebut = $faker->dateTimeBetween("1 week", "1 year");;
                     $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
@@ -51,16 +63,17 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
                         if (rand(0, 100) < 12) $sortie->addParticipant($faker->randomElement($allUsers));
                     }
                     break;
-                case $random < 45:
-                    $sortie->setEtat(Etat::CLOTUREE->value);
-                    $dateHeureDebut = $faker->dateTimeBetween("5 day", "1 month");;
-                    $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
-                    $sortie->setDateLimiteInscription($sortie->getDateHeureDebut()->sub(new DateInterval("P1D")));
-                    for ($j = 0; $j < $sortie->getNbInscriptionMax(); $j++) {
-                        $sortie->addParticipant($faker->randomElement($allUsers));
+                case $random < self::seuil(Etat::CLOTUREE):
+                    if (rand(0, 1)) {
+                        $sortie->setEtat(Etat::CLOTUREE->value);
+                        $dateHeureDebut = $faker->dateTimeBetween("5 day", "1 month");;
+                        $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
+                        $sortie->setDateLimiteInscription($sortie->getDateHeureDebut()->sub(new DateInterval("P1D")));
+                        for ($j = 0; $j < $sortie->getNbInscriptionMax(); $j++) {
+                            $sortie->addParticipant($faker->randomElement($allUsers));
+                        }
+                        break;
                     }
-                    break;
-                case $random < 60:
                     $sortie->setEtat(Etat::CLOTUREE->value);
                     $dateHeureDebut = $faker->dateTimeBetween("5 day", "1 month");;
                     $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
@@ -69,7 +82,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
                         if (rand(0, 100) < 85) $sortie->addParticipant($faker->randomElement($allUsers));
                     }
                     break;
-                case $random < 70:
+                case $random < self::seuil(Etat::EN_COURS):
                     $sortie->setEtat(Etat::EN_COURS->value);
                     $dateHeureDebut = $faker->dateTimeBetween("-2 day", "now");;
                     $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
@@ -79,20 +92,20 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
                         if (rand(0, 100) < 85) $sortie->addParticipant($faker->randomElement($allUsers));
                     }
                     break;
-                case $random < 80:
+                case $random < self::seuil(Etat::TERMINEE):
                     $sortie->setEtat(Etat::TERMINEE->value);
                     $dateHeureDebut = $faker->dateTimeBetween("-20 days", "-1 day");;
                     $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
-                    $sortie->setDateLimiteInscription((new DateTimeImmutable())->sub(new DateInterval("P". rand(1, 8) ."D")));
+                    $sortie->setDateLimiteInscription($sortie->getDateHeureDebut()->sub(new DateInterval("P". rand(1, 8) ."D")));
                     for ($j = 0; $j < $sortie->getNbInscriptionMax(); $j++) {
                         if (rand(0, 100) < 85) $sortie->addParticipant($faker->randomElement($allUsers));
                     }
                     break;
-                case $random < 85:
+                case $random < self::seuil(Etat::ANNULEE):
                     $sortie->setEtat(Etat::ANNULEE->value);
                     $dateHeureDebut = $faker->dateTimeBetween("-10 days", "10 day");;
                     $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
-                    $sortie->setDateLimiteInscription((new DateTimeImmutable())->sub(new DateInterval("P". rand(1, 8) ."D")));
+                    $sortie->setDateLimiteInscription($sortie->getDateHeureDebut()->sub(new DateInterval("P". rand(1, 8) ."D")));
                     for ($j = 0; $j < $sortie->getNbInscriptionMax(); $j++) {
                         if (rand(0, 100) < 30) $sortie->addParticipant($faker->randomElement($allUsers));
                     }
@@ -101,7 +114,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
                     $sortie->setEtat(Etat::HISTORISEE->value);
                     $dateHeureDebut = $faker->dateTimeBetween("-3 months", "-1 month");;
                     $sortie->setDateHeureDebut(DateTimeImmutable::createFromMutable($dateHeureDebut));
-                    $sortie->setDateLimiteInscription((new DateTimeImmutable())->sub(new DateInterval("P". rand(1, 8) ."D")));
+                    $sortie->setDateLimiteInscription($sortie->getDateHeureDebut()->sub(new DateInterval("P". rand(1, 8) ."D")));
                     for ($j = 0; $j < $sortie->getNbInscriptionMax(); $j++) {
                         if (rand(0, 100) < 80) $sortie->addParticipant($faker->randomElement($allUsers));
                     }
@@ -110,6 +123,15 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
             $manager->persist($sortie);
         }
         $manager->flush();
+    }
+
+    private static function seuil(Etat $etat) : int {
+        $seuil = 0;
+        foreach (self::REPARTITION as $key => $value) {
+            $seuil += $value;
+            if ($key == $etat->value) break;
+        }
+        return $seuil;
     }
 
     public function getDependencies(): array
