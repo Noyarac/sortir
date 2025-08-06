@@ -32,7 +32,7 @@ class Sortie
 
     #[ORM\Column]
     #[Assert\NotNull(message: "Merci d'indiquer le nombre maximum de participants")]
-    #[Assert\Range(notInRangeMessage: "Le nombre maximum d'inscrits doit être compris entre 5 et 1000.", min: 5, max: 1000)]
+    #[Assert\Range(notInRangeMessage: "Le nombre maximum d'inscrits doit être compris entre 5 et 1000.", min: 5, max: 100)]
     private ?int $nbInscriptionMax = null;
 
     #[ORM\Column(length: 1000)]

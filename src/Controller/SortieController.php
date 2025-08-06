@@ -20,5 +20,12 @@ final class SortieController extends AbstractController
             "sortie" => $sortie,
         ]);
     }
+    #[Route('/creation', name: 'sortie_creation', requirements: ["id" => "\d+"])]
+    public function creationSortie(Request $request): Response
+    {
+        return $this->render('sortie/creation.html.twig', [
+
+        ]);
+    }
 
 }
