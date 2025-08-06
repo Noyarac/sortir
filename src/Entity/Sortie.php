@@ -21,7 +21,7 @@ class Sortie
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Merci d'indiquer un nom pour cette sortie!" )]
-    #[Assert\Length(min: 1, max: 255, minMessage: "Merci de choisir un nom contenant au moins 3 caractères.",
+    #[Assert\Length(min: 3, max: 255, minMessage: "Merci de choisir un nom contenant au moins 3 caractères.",
     maxMessage: "Maximum 255 caractères autorisés")]
     private ?string $nom = null;
 
@@ -46,7 +46,7 @@ class Sortie
 
     #[ORM\Column]
     #[Assert\NotNull(message: "Merci d'indiquer la durée")]
-    #[Assert\Range(notInRangeMessage: "La durée doit être comprise entre 15 minutes et 3 jours (4 320 minutes)", min: 5, max: 1000)]
+    #[Assert\Range(notInRangeMessage: "La durée doit être comprise entre 15 minutes et 3 jours (4 320 minutes)", min: 15, max: 4320)]
     private ?int $duree = null;
 
     #[ORM\Column]

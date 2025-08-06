@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Etat;
 use App\Entity\Sortie;
-use App\Form\CampusType;
 use App\Form\SortieType;
 use App\Security\Voter\SortieVoter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,8 +23,8 @@ final class SortieController extends AbstractController
             "sortie" => $sortie,
         ]);
     }
-    #[Route('/creation', name: 'sortie_creation', requirements: ["id" => "\d+"])]
-    public function creationSortie(Request $request): Response
+    #[Route('/creation', name: 'sortie_creation', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
+    public function creationSortie(Request $request, EntityManagerInterface $entityManager): Response
     {
         $sortie = new Sortie();
         //Inutile de vérifier que $user existe car application entièrement protégée et seulement accessible à ROLE_USER
@@ -33,6 +33,25 @@ final class SortieController extends AbstractController
         $sortie->setCampus($user->getCampus());
 
         $sortieForm = $this->createForm(SortieType::class, $sortie);
+
+        $sortieForm->handleRequest($request);
+
+        if($sortieForm->isSubmitted() && $sortieForm->isValid()){
+            if($request->request->has('Enregistrer')){
+                $sortie->setEtat(Etat::EN_CREATION->value);
+                $this->addFlash("success", "Sortie créée avec succès! Attention, elle n'est pas encore publiée.");
+            }
+            else if ($request->request->has('Publier')){
+                $sortie->setEtat(Etat::OUVERTE->value);
+                $this->addFlash("success", "Sortie publiée avec succès!");
+            }
+
+            $entityManager->persist($sortie);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('main_home');
+
+        }
 
         return $this->render('sortie/creation.html.twig', [
             'sortieForm' => $sortieForm,

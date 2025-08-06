@@ -24,6 +24,10 @@ class SortieType extends AbstractType
         $builder
             ->add('nom', TextType::class, [
                 'label' => 'Nom de la sortie',
+                'attr' => [
+                    'minlength' => 3,
+                    'maxlength' => 255,
+                ],
             ])
             ->add('dateHeureDebut', DateTimeType::class, [
                 'widget' => 'single_text',
@@ -51,12 +55,16 @@ class SortieType extends AbstractType
                 'label' => 'Durée (en minutes)',
                 'data' => 60,
                 'attr' => [
-                    'min' => 5,
-                    'max' => 100,
+                    'min' => 15,
+                    'max' => 4320,
                 ],
             ])
             ->add('infosSortie', TextareaType::class, [
                 'label' => 'Description et infos',
+                'attr' => [
+                    'minlength' => 5,
+                    'maxlength' => 1000,
+                ],
             ])
             ->add('campus', EntityType::class, [
                 'label' => 'Campus',
@@ -75,10 +83,8 @@ class SortieType extends AbstractType
                 'mapped' => false,
                 'disabled' => true,
             ])
-            ->add('ville', EntityType::class, [
+            ->add('ville', TextType::class, [
                 'label' => 'Ville',
-                'class' => Ville::class,
-                'choice_label' => 'nom',
                 'mapped' => false,
                 'disabled' => true,
             ])

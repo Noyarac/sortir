@@ -9,13 +9,17 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class LieuController extends AbstractController
 {
-    #[Route('/lieu/{idLieu}', name: 'lieu_details', requirements: ['idLieu' => '\d+'], methods: ['GET'])]
+    #[Route('/lieu/{id}', name: 'lieu_details', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function details(Lieu $lieu): JsonResponse
     {
+        $ville = $lieu->getVille();
+        $villeNom = $ville->getNom();
+        $villeCP = $ville->getCodePostal();
+
         return new JsonResponse([
             'rue' => $lieu->getRue(),
-            'ville' => $lieu->getVille()->getNom(),
-            'codePostal' => $lieu->getVille()->getCodePostal(),
+            'ville' => $villeNom,
+            'codePostal' => $villeCP,
             'latitude' => $lieu->getLatitude(),
             'longitude' => $lieu->getLongitude()
         ]);

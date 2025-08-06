@@ -43,32 +43,42 @@
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const lieuSelect = document.getElementById('{{ sortieForm.lieu.vars.id }}');
+        document.addEventListener('turbo:load', init);
+        document.addEventListener('turbo:render', init);
 
-        lieuSelect.addEventListener('change', function() {
-        const lieuId = this.value;
-        if(!lieuId) {
-            // On nettoie les champs si aucun lieu n'est sélectionné
-            document.getElementById('{{ sortieForm.rue.vars.id }}').value = '';
-            document.getElementById('{{ sortieForm.ville.vars.id }}').value = '';
-            document.getElementById('{{ sortieForm.latitude.vars.id }}').value = '';
-            document.getElementById('{{ sortieForm.longitude.vars.id }}').value = '';
-            return;
+        function init() {
+            const lieuSelect = document.getElementById('{{ sortieForm.lieu.vars.id }}');
+            if (!lieuSelect) return;
+
+            function chargerDonneesLieu(lieuId) {
+                if (!lieuId) {
+                    document.getElementById('{{ sortieForm.rue.vars.id }}').value = '';
+                    document.getElementById('{{ sortieForm.codePostal.vars.id }}').value = '';
+                    document.getElementById('{{ sortieForm.ville.vars.id }}').value = '';
+                    document.getElementById('{{ sortieForm.latitude.vars.id }}').value = '';
+                    document.getElementById('{{ sortieForm.longitude.vars.id }}').value = '';
+                    return;
+                }
+                fetch(`/lieu/${lieuId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('{{ sortieForm.rue.vars.id }}').value = data.rue || '';
+                        document.getElementById('{{ sortieForm.ville.vars.id }}').value = data.ville || '';
+                        document.getElementById('{{ sortieForm.codePostal.vars.id }}').value = data.codePostal || '';
+                        document.getElementById('{{ sortieForm.latitude.vars.id }}').value = data.latitude || '';
+                        document.getElementById('{{ sortieForm.longitude.vars.id }}').value = data.longitude || '';
+                    });
+            }
+
+            lieuSelect.addEventListener('change', function() {
+                chargerDonneesLieu(this.value);
+            });
+
+            if (lieuSelect.value) {
+                chargerDonneesLieu(lieuSelect.value);
+            }
         }
 
-        fetch(`/lieu/${lieuId}`)
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById('{{ sortieForm.rue.vars.id }}').value = data.rue;
-                document.getElementById('{{ sortieForm.ville.vars.id }}').value = data.ville.nom;
-                document.getElementById('{{ sortieForm.latitude.vars.id }}').value = data.latitude;
-                document.getElementById('{{ sortieForm.longitude.vars.id }}').value = data.longitude;
-            })
-        });
-    });
     </script>
 {% endblock %}
 
