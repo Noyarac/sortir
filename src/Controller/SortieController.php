@@ -49,7 +49,7 @@ final class SortieController extends AbstractController
         $sortie->removeParticipant($user);
         $em->persist($sortie);
         $em->flush();
-        $this->addFlash("succes", "Vous vous êtes désisté(e) avec succès.");
+        $this->addFlash("success", "Vous vous êtes désisté(e) avec succès.");
         return $this->redirectToRoute("main_home");
     }
 

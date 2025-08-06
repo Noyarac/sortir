@@ -45,15 +45,15 @@ final class SortieVoter extends Voter
     private function inscription(Sortie $sortie, User $user) : bool {
         return
             !in_array($user, $sortie->getParticipants()->getValues())
-            && $sortie->getDateLimiteInscription() <= new DateTimeImmutable()
-            && $sortie->getEtat() == Etat::OUVERTE
+            && $sortie->getDateLimiteInscription() >= new DateTimeImmutable()
+            && $sortie->getEtat() == Etat::OUVERTE->value
             && sizeof($sortie->getParticipants()) < $sortie->getNbInscriptionMax();
     }
 
     private function desistement(Sortie $sortie, User $user) : bool {
         return
             in_array($user, $sortie->getParticipants()->getValues())
-            && in_array($sortie->getEtat(), [Etat::OUVERTE, Etat::CLOTUREE])
-            && $sortie->getDateHeureDebut() < new DateTimeImmutable();
+            && in_array($sortie->getEtat(), [Etat::OUVERTE->value, Etat::CLOTUREE->value])
+            && $sortie->getDateHeureDebut() > new DateTimeImmutable();
     }
 }
