@@ -31,7 +31,10 @@
                             <td>{{ sortie.etat|replace({'_': ' '})|capitalize}}</td>
                             <td>{{app.user in sortie.participants ? "✔" : ""}}</td>
                             <td><a href="{{ path('profil_afficher', {'id': sortie.organisateur.id}) }}" data-turbo="false">{{ sortie.organisateur.pseudo}}</a></td>
-                            <td></td>
+                            <td>
+                            {% if is_granted('sortie_inscription', sortie) %}<a href="{{ path('sortie_inscription', parameters: {id: sortie.id}) }}" data-turbo="false">S'inscrire</a>{% endif %}
+                            {% if is_granted('sortie_desistement', sortie) %}<a href="{{ path('sortie_desistement', parameters: {id: sortie.id}) }}" data-turbo="false">Se désister</a>{% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
