@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Etat;
 use App\Entity\Sortie;
 use App\Form\FiltreSortiesType;
+use App\Form\SortieType;
 use App\Security\Voter\SortieVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -19,6 +22,40 @@ final class SortieController extends AbstractController
     {
         return $this->render('sortie/details.html.twig', [
             "sortie" => $sortie,
+        ]);
+    }
+    #[Route('/creation', name: 'sortie_creation', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
+    public function creationSortie(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $sortie = new Sortie();
+        //Inutile de vérifier que $user existe car application entièrement protégée et seulement accessible à ROLE_USER
+        $user = $this->getUser();
+        $sortie->setOrganisateur($user);
+        $sortie->setCampus($user->getCampus());
+
+        $sortieForm = $this->createForm(SortieType::class, $sortie);
+
+        $sortieForm->handleRequest($request);
+
+        if($sortieForm->isSubmitted() && $sortieForm->isValid()){
+            if($request->request->has('Enregistrer')){
+                $sortie->setEtat(Etat::EN_CREATION->value);
+                $this->addFlash("success", "Sortie créée avec succès! Attention, elle n'est pas encore publiée.");
+            }
+            else if ($request->request->has('Publier')){
+                $sortie->setEtat(Etat::OUVERTE->value);
+                $this->addFlash("success", "Sortie publiée avec succès!");
+            }
+
+            $entityManager->persist($sortie);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('main_home');
+
+        }
+
+        return $this->render('sortie/creation.html.twig', [
+            'sortieForm' => $sortieForm,
         ]);
     }
 

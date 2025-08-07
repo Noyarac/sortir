@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Création d'une sortie | {{parent()}} {% endblock %}
+
+{% block body %}
+	<div class="container">
+        <h3>Créer une sortie</h3>
+        {{ form_start(sortieForm) }}
+
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(sortieForm.nom) }}
+                {{ form_row(sortieForm.dateHeureDebut) }}
+                {{ form_row(sortieForm.dateLimiteInscription) }}
+                {{ form_row(sortieForm.nbInscriptionMax) }}
+                {{ form_row(sortieForm.duree) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(sortieForm.campus) }}
+                {{ form_row(sortieForm.lieu) }}
+                {{ form_row(sortieForm.ville) }}
+                {{ form_row(sortieForm.codePostal) }}
+                {{ form_row(sortieForm.rue) }}
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(sortieForm.latitude) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(sortieForm.longitude) }}
+                    </div>
+                </div>
+            </div>
+            {{ form_row(sortieForm.infosSortie) }}
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" name="Enregistrer" class="btn btn-primary">Enregistrer</button>
+            <button type="submit" name="Publier" class="btn btn-success">Publier</button>
+            <a href="{{ path('main_home') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+
+        {{ form_end(sortieForm) }}
+    </div>
+
+    <script>
+        document.addEventListener('turbo:load', init);
+        document.addEventListener('turbo:render', init);
+
+        function init() {
+            const lieuSelect = document.getElementById('{{ sortieForm.lieu.vars.id }}');
+            if (!lieuSelect) return;
+
+            function chargerDonneesLieu(lieuId) {
+                if (!lieuId) {
+                    document.getElementById('{{ sortieForm.rue.vars.id }}').value = '';
+                    document.getElementById('{{ sortieForm.codePostal.vars.id }}').value = '';
+                    document.getElementById('{{ sortieForm.ville.vars.id }}').value = '';
+                    document.getElementById('{{ sortieForm.latitude.vars.id }}').value = '';
+                    document.getElementById('{{ sortieForm.longitude.vars.id }}').value = '';
+                    return;
+                }
+                fetch(`/lieu/${lieuId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('{{ sortieForm.rue.vars.id }}').value = data.rue || '';
+                        document.getElementById('{{ sortieForm.ville.vars.id }}').value = data.ville || '';
+                        document.getElementById('{{ sortieForm.codePostal.vars.id }}').value = data.codePostal || '';
+                        document.getElementById('{{ sortieForm.latitude.vars.id }}').value = data.latitude || '';
+                        document.getElementById('{{ sortieForm.longitude.vars.id }}').value = data.longitude || '';
+                    });
+            }
+
+            lieuSelect.addEventListener('change', function() {
+                chargerDonneesLieu(this.value);
+            });
+
+            if (lieuSelect.value) {
+                chargerDonneesLieu(lieuSelect.value);
+            }
+        }
+
+    </script>
+{% endblock %}
+
+
