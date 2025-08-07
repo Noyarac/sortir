@@ -33,13 +33,29 @@
             {{ form_row(sortieForm.infosSortie) }}
         </div>
 
-        <div class="mt-3">
-            <button type="submit" name="Enregistrer" class="btn btn-primary">Enregistrer</button>
-            <button type="submit" name="Publier" class="btn btn-success">Publier</button>
-            <a href="{{ path('main_home') }}" class="btn btn-secondary">Retour à la liste</a>
-        </div>
+        <div class="mt-3 d-flex gap-2 align-items-center">
 
-        {{ form_end(sortieForm) }}
+            {# Boutons du formulaire principal #}
+            <button type="submit" name="en_creation" class="btn btn-primary">Enregistrer</button>
+            <button type="submit" name="ouverte" class="btn btn-success">Publier</button>
+            <a href="{{ path('main_home') }}" class="btn btn-secondary">Retour à la liste</a>
+
+            {{ form_end(sortieForm) }}
+
+            {# Formulaire suppression : form séparé, affiché inline #}
+            {% if isModification and is_granted('sortie_modification', sortie) %}
+                <form method="post"
+                      action="{{ path('sortie_suppression', {'id': sortie.id}) }}"
+                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette sortie ?');"
+                      class="d-inline m-0 p-0"
+                      style="display: inline;"
+                >
+                    <input type="hidden" name="_token" value="{{ csrf_token('suppression_sortie_' ~ sortie.id) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            {% endif %}
+
+        </div>
     </div>
 
     <script>
