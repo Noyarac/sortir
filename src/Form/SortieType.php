@@ -57,7 +57,7 @@ class SortieType extends AbstractType
                 'label' => 'Description et infos',
                 'attr' => [
                     'minlength' => 5,
-                    'maxlength' => 1000,
+                    'maxlength' => 950,
                 ],
             ])
             ->add('campus', EntityType::class, [

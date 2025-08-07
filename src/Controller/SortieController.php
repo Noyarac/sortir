@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Etat;
 use App\Entity\Sortie;
 use App\Form\FiltreSortiesType;
+use App\Form\SortieAnnulationType;
 use App\Form\SortieType;
 use App\Security\Voter\SortieVoter;
 use App\Service\SortieService;
@@ -91,6 +92,49 @@ final class SortieController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/publication', name: 'sortie_publication', requirements: ["id" => "\d+"], methods: ["POST"])]
+    #[IsGranted('sortie_modification', 'sortie')]
+    public function publicationSortie(Sortie $sortie, Request $request): Response
+    {
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('publication_sortie_' . $sortie->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $this->addFlash('danger', "Cette sortie n'a pas pu être publiée, jeton CSRF invalide");
+            return $this->redirectToRoute('main_home');
+        }
+
+        $this->sortieService->gererEtatSortie($sortie, Etat::OUVERTE->value);
+        $this->addFlash('success', 'Sortie publiée avec succès.');
+
+        return $this->redirectToRoute('main_home');
+    }
+
+    #[Route('/{id}/annulation', name: 'sortie_annulation', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
+    #[IsGranted('sortie_annulation', 'sortie')]
+    public function annulationSortie(Sortie $sortie, Request $request): Response
+    {
+        $sortieAnnulationForm = $this->createForm(SortieAnnulationType::class);
+        $sortieAnnulationForm->handleRequest($request);
+
+        if($sortieAnnulationForm->isSubmitted() && $sortieAnnulationForm->isValid()){
+            $motifAnnulation = $sortieAnnulationForm->get('motif')->getData();
+            $descriptionEtInfos = $sortie->getInfosSortie();
+            $descriptionEtInfos .= "\n SORTIE ANNULÉE : ";
+            $descriptionEtInfos .= $motifAnnulation;
+
+            $sortie->setInfosSortie($descriptionEtInfos);
+
+            $this->sortieService->gererEtatSortie($sortie, Etat::ANNULEE->value);
+            $this->addFlash('success', 'Cette sortie a bien été annulée.');
+            return $this->redirectToRoute('main_home');
+        }
+
+        return $this->render('sortie/annulation.html.twig', [
+            'sortie' => $sortie,
+            'sortieAnnulationForm' => $sortieAnnulationForm,
+        ]);
+    }
+
     #[Route('/{id}/suppression', name: 'sortie_suppression', requirements: ["id" => "\d+"], methods: ["POST"])]
     #[IsGranted('sortie_modification', 'sortie')]
     public function suppressionSortie(Sortie $sortie, Request $request, EntityManagerInterface $entityManager): Response
@@ -98,7 +142,7 @@ final class SortieController extends AbstractController
         // Vérifier le token CSRF
         $tokenIsValid = $this->isCsrfTokenValid('suppression_sortie_' . $sortie->getId(), $request->request->get('_token'));
         if (!$tokenIsValid) {
-            $this->addFlash('danger', "Cette sortie n'a pas pu être supprimé, jeton CSRF invalide");
+            $this->addFlash('danger', "Cette sortie n'a pas pu être supprimée, jeton CSRF invalide");
             return $this->redirectToRoute('main_home');
         }
 
@@ -117,6 +161,13 @@ final class SortieController extends AbstractController
             $this->addFlash("danger", "Il n'est pas possible de s'inscrire à cette sortie");
             return $this->redirectToRoute("main_home");
         }
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('inscription_sortie_' . $sortie->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $this->addFlash('danger', "Inscription impossible, jeton CSRF invalide");
+            return $this->redirectToRoute('main_home');
+        }
+
         if ($sortieService->inscription($sortie, $user)) {
             $this->addFlash("success", "Vous vous êtes inscrit(e) avec succès.");
         } else {
@@ -132,11 +183,18 @@ final class SortieController extends AbstractController
             $this->addFlash("danger", "Il n'est pas possible de se désister de cette sortie");
             return $this->redirectToRoute("main_home");
         }
-        if ($sortieService->desistement($sortie, $user)) {
-            $this->addFlash("success", "Vous vous êtes désisté(e) avec succès.");
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('desistement_sortie_' . $sortie->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $this->addFlash('danger', "Désistement impossible, jeton CSRF invalide");
+            return $this->redirectToRoute('main_home');
+        }
+                if ($sortieService->desistement($sortie, $user)) {
+        $this->addFlash("success", "Vous vous êtes désisté(e) avec succès.");
         } else {
             $this->addFlash("danger", "Une erreur est survenue, votre désinscription n'a pas été prise en compte.");
         }
+
         return $this->redirectToRoute("main_home");
     }
 

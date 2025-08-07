@@ -4,7 +4,12 @@
 
 {% block body %}
 	<div class="container">
-        <h3>Créer une sortie</h3>
+        {% if isModification %}
+            <h3>Modifier une sortie</h3>
+        {% else %}
+            <h3>Créer une sortie</h3>
+        {% endif %}
+
         {{ form_start(sortieForm) }}
 
         <div class="row">
@@ -48,7 +53,6 @@
                       action="{{ path('sortie_suppression', {'id': sortie.id}) }}"
                       onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette sortie ?');"
                       class="d-inline m-0 p-0"
-                      style="display: inline;"
                 >
                     <input type="hidden" name="_token" value="{{ csrf_token('suppression_sortie_' ~ sortie.id) }}">
                     <button type="submit" class="btn btn-danger">Supprimer</button>

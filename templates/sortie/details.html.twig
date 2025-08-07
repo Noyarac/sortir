@@ -2,7 +2,11 @@
 
 {% block body %}
 	<div class="container">
-        <h3 class="ms-4">Afficher une sortie</h3>
+        <h3 class="ms-4">Afficher une sortie
+            {% if sortie.etat == "annulee" %}
+                <span class="badge text-bg-danger">Annulée</span>
+            {% endif %}
+        </h3>
         <dl class="dlStyle">
             <div>
                     <div>
@@ -56,7 +60,7 @@
             <div>
                 <div>
                         <dt>Description</dt>
-                        <dd>{{sortie.infosSortie}}</dd>
+                        <dd>{{sortie.infosSortie | nl2br}}</dd>
                     </div>
             </div>
             <div>
