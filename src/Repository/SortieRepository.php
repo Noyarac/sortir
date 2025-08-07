@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Etat;
 use App\Entity\Sortie;
 use App\Form\DTO\FiltreSortie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -17,20 +18,55 @@ class SortieRepository extends ServiceEntityRepository
         parent::__construct($registry, Sortie::class);
     }
 
-       /**
-        * @return Sortie[] Returns an array of Sortie objects
-        */
-       public function findByFilter(FiltreSortie $filtreSortie): array
-       {
-           return $this->createQueryBuilder('s')
-               ->andWhere('s.campus = :campus')
-               ->setParameter('campus', $filtreSortie->getCampus())
-               ->orderBy('s.id', 'ASC')
-               ->setMaxResults(10)
-               ->getQuery()
-               ->getResult()
-           ;
-       }
+    /**
+     * @return Sortie[] Returns an array of Sortie objects
+     */
+    public function findByFilter(FiltreSortie $filtreSortie): array
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->andWhere('s.campus = :campus')
+            ->setParameter('campus', $filtreSortie->getCampus());
+        if ($filtreSortie->getContient()) {
+            $qb->andWhere($qb->expr()->like('s.nom', ':contient'))
+                ->setParameter("contient", "%" . $filtreSortie->getContient() . "%");
+        }
+        if ($filtreSortie->getDebut()) {
+            $qb->andWhere("s.dateHeureDebut >= :debut")
+                ->setParameter("debut", $filtreSortie->getDebut());
+        }
+        if ($filtreSortie->getFin()) {
+            $qb->andWhere("s.dateHeureDebut <= :fin")
+                ->setParameter("fin", $filtreSortie->getFin());
+        }
+        if ($filtreSortie->getOrganisateur()) {
+            $qb->andWhere("s.organisateur = :organisateur")
+                ->setParameter("organisateur", $filtreSortie->getUser());
+        }
+        if ($filtreSortie->getParticipant() || $filtreSortie->getNonParticipant()) {
+            $qb->leftJoin("s.participants", "p");
+        }
+        if ($filtreSortie->getParticipant() && !$filtreSortie->getNonParticipant()) {
+            $qb->andWhere("p.id = :participantId")
+                ->setParameter("participantId", $filtreSortie->getUser()->getId());
+        }
+        if ($filtreSortie->getNonParticipant() && !$filtreSortie->getParticipant()) {
+            $qb->andWhere('s.id NOT IN (
+                SELECT sortie2.id FROM App\Entity\Sortie sortie2
+                JOIN sortie2.participants participant2
+                WHERE participant2.id = :nonParticipantId
+            )')
+                ->setParameter('nonParticipantId', $filtreSortie->getUser()->getId());
+        }
+        if ($filtreSortie->getTerminees()) {
+            $qb->andWhere("s.etat = '" . Etat::TERMINEE->value ."'");
+        }
+
+
+        return $qb->orderBy('s.dateHeureDebut', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
     //    /**
     //     * @return Sortie[] Returns an array of Sortie objects

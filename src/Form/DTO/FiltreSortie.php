@@ -3,6 +3,7 @@
 namespace App\Form\DTO;
 
 use App\Entity\Campus;
+use App\Entity\User;
 use DateTimeImmutable;
 
 class FiltreSortie
@@ -15,7 +16,8 @@ class FiltreSortie
         private ?bool $organisateur = null,
         private ?bool $participant = null,
         private ?bool $nonParticipant = null,
-        private ?bool $terminees = null
+        private ?bool $terminees = null,
+        private ?User $user = null
     )
     {}
 
@@ -179,4 +181,24 @@ class FiltreSortie
 
         return $this;
     }
+
+        /**
+         * Get the value of user
+         */ 
+        public function getUser()
+        {
+                return $this->user;
+        }
+
+        /**
+         * Set the value of user
+         *
+         * @return  self
+         */ 
+        public function setUser($user)
+        {
+                $this->user = $user;
+
+                return $this;
+        }
 }

@@ -23,6 +23,7 @@ final class MainController extends AbstractController
         $filtreSortie = new FiltreSortie();
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
+        $filtreSortie->setUser($user);
         $filtreSortie->setCampus($user->getCampus());
 
         // Filtre : Ecrasement si cookie présent

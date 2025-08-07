@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,21 +25,21 @@ class FiltreSortieType extends AbstractType
                 'choice_label' => 'nom',
             ])
             ->add("contient", TextType::class, [
-                'label' => "contient...",
+                'label' => "Le nom de la sortie contient",
                 'attr' => [
                     'minlength' => 3,
                     'maxlength' => 255,
                 ],
                 "required" => false
             ])
-            ->add('debut', DateTimeType::class, [
+            ->add('debut', DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Entre',
                 'input' => 'datetime_immutable',
                 'html5' => true,
                 "required" => false
             ])
-            ->add('fin', DateTimeType::class, [
+            ->add('fin', DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'et',
                 'input' => 'datetime_immutable',
@@ -61,7 +62,6 @@ class FiltreSortieType extends AbstractType
                 'label' => "Sorties terminées",
                 "required" => false
             ])
-            ->add("submit", SubmitType::class)
         ;
     }
 
