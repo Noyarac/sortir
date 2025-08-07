@@ -19,28 +19,26 @@ final class MainController extends AbstractController
     #[Route('/', name: 'main_home', methods: ["GET", "POST"])]
     public function home(Request $request, SortieRepository $sortieRepository, CampusRepository $campusRepository): Response
     {
-        // Filtre : valeurs par défaut
-        $filtreSortie = new FiltreSortie();
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
-        $filtreSortie->setUser($user);
-        $filtreSortie->setCampus($user->getCampus());
 
-        // Filtre : Ecrasement si cookie présent
+        // Filtre : Récupération si existence du cookie
         $filtreCookie = $request->cookies->get("filtreSortie");
         if ($filtreCookie) {
             $filtreSortie = unserialize($filtreCookie);
+        } else {
+        // Filtre : valeurs par défaut
+            $filtreSortie = new FiltreSortie();
+            $filtreSortie->setUser($user);
+            $filtreSortie->setCampus($user->getCampus());
         }
 
         // Rechargement de l'objet Campus
         $filtreSortie->setCampus($campusRepository->find($filtreSortie->getCampus()->getId()));
 
-
-        $filtreForm = $this->createForm(FiltreSortieType::class, $filtreSortie);
+        // Creation du formulaire de filtre
+        $filtreForm = $this->createForm(FiltreSortieType::class, $filtreSortie, ['csrf_protection' => false]);
         $filtreForm->handleRequest($request);
-
-        // if ($filtreForm->isSubmitted() && $filtreForm->isValid()) {
-        // }
 
         $sorties = $sortieRepository->findByFilter($filtreSortie);
         $response = $this->render('main/home.html.twig', [
