@@ -7,11 +7,11 @@
 
 {% block body %}
 	<section>
+		{{ form_start(filtreForm, {'attr': {'data-turbo': 'false'}})}}
 		<div class="container">
 			<div class="row">
 				<h5 class="ms-4">Filtrer les sorties</h5>
 				<div class="col-5">
-					{{ form_start(filtreForm, {'attr': {'data-turbo': 'false'}})}}
 					{{ form_row(filtreForm.campus) }}
 					{{ form_row(filtreForm.contient) }}
 					<div class="row">
@@ -31,63 +31,63 @@
 				</div>
 				<div class="col-2">
 					<button type="submit" class="btn btn-primary">Rechercher</button>
-					{{ form_end(filtreForm) }}
 				</div>
 			</div>
 		</div>
+		{{ form_end(filtreForm) }}
 	</section>
-    <hr>
+	<hr>
 	<section>
 		<div class="container">
-            {% if sorties is not empty %}
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Date</th>
-                            <th>Cloture</th>
-                            <th>Inscrits</th>
-                            <th>Etat</th>
-                            <th>Inscrit</th>
-                            <th>Organisateur</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for sortie in sorties %}
-                            {% if is_granted("sortie_brouillon", sortie) %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ path('sortie_details', parameters: {id: sortie.id}) }}" data-turbo="false">{{ sortie.nom}}</a>
-                                    </td>
-                                    <td>{{ sortie.dateHeureDebut | date("d/m/Y")}}</td>
-                                    <td>{{ sortie.dateLimiteInscription | date("d/m/Y")}}</td>
-                                    <td>{{sortie.participants | length }}{{sortie.nbInscriptionMax ? " / " : ""}}{{sortie.nbInscriptionMax}}</td>
-                                    <td>{{ sortie.etat|replace({'_': ' '})|capitalize}}</td>
-                                    <td>{{app.user in sortie.participants ? "✔" : ""}}</td>
-                                    <td>
-                                        <a href="{{ path('profil_afficher', {'id': sortie.organisateur.id}) }}" data-turbo="false">{{ sortie.organisateur.pseudo}}</a>
-                                    </td>
-                                    <td>
-                                        {% if is_granted('sortie_inscription', sortie) %}
-                                            <form method="post" action="{{ path('sortie_inscription', parameters: {id: sortie.id}) }}">
-                                                <button class="btn btn-primary" type="submit">S'inscrire</button>
-                                            </form>
-                                        {% endif %}
-                                        {% if is_granted('sortie_desistement', sortie) %}
-                                            <form method="post" action="{{ path('sortie_desistement', parameters: {id: sortie.id}) }}">
-                                                <button class="btn btn-secondary" type="submit">Se désister</button>
-                                            </form>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <div>Il n'y a pas de sorties.</div>
-            {% endif %}
-        </div>
+			{% if sorties is not empty %}
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Nom</th>
+							<th>Date</th>
+							<th>Cloture</th>
+							<th>Inscrits</th>
+							<th>Etat</th>
+							<th>Inscrit</th>
+							<th>Organisateur</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for sortie in sorties %}
+							{% if is_granted("sortie_brouillon", sortie) %}
+								<tr>
+									<td>
+										<a href="{{ path('sortie_details', parameters: {id: sortie.id}) }}" data-turbo="false">{{ sortie.nom}}</a>
+									</td>
+									<td>{{ sortie.dateHeureDebut | date("d/m/Y")}}</td>
+									<td>{{ sortie.dateLimiteInscription | date("d/m/Y")}}</td>
+									<td>{{sortie.participants | length }}{{sortie.nbInscriptionMax ? " / " : ""}}{{sortie.nbInscriptionMax}}</td>
+									<td>{{ sortie.etat|replace({'_': ' '})|capitalize}}</td>
+									<td>{{app.user in sortie.participants ? "✔" : ""}}</td>
+									<td>
+										<a href="{{ path('profil_afficher', {'id': sortie.organisateur.id}) }}" data-turbo="false">{{ sortie.organisateur.pseudo}}</a>
+									</td>
+									<td>
+										{% if is_granted('sortie_inscription', sortie) %}
+											<form method="post" action="{{ path('sortie_inscription', parameters: {id: sortie.id}) }}">
+												<button class="btn btn-primary" type="submit">S'inscrire</button>
+											</form>
+										{% endif %}
+										{% if is_granted('sortie_desistement', sortie) %}
+											<form method="post" action="{{ path('sortie_desistement', parameters: {id: sortie.id}) }}">
+												<button class="btn btn-secondary" type="submit">Se désister</button>
+											</form>
+										{% endif %}
+									</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>
+			{% else %}
+				<div>Il n'y a pas de sorties.</div>
+			{% endif %}
+		</div>
 	</section>
 {% endblock %}
