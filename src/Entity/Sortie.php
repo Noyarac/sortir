@@ -35,10 +35,10 @@ class Sortie
     #[Assert\Range(notInRangeMessage: "Le nombre maximum d'inscrits doit être compris entre 5 et 1000.", min: 3, max: 100)]
     private ?int $nbInscriptionMax = null;
 
-    #[ORM\Column(length: 1500)]
+    #[ORM\Column(length: 1500)] //En cas d'annulation, le motif sera ajouté aux infos de la sortie
     #[Assert\NotBlank(message : "N'oubliez pas de compléter la description. Elles est essentielle pour donner envie aux personnes de s'incrire!")]
-    #[Assert\Length(min: 5, max:1000, minMessage: "C'est un peu court, au moins 5 caractères requis",
-    maxMessage: "Maximum 1000 caractères autorisés")]
+    #[Assert\Length(min: 5, max:950, minMessage: "C'est un peu court, au moins 5 caractères requis",
+    maxMessage: "Maximum 950 caractères autorisés")]
     private ?string $infosSortie = null;
 
     #[ORM\Column(length: 255)]

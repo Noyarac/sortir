@@ -78,23 +78,23 @@
                                         {% if is_granted('sortie_desistement', sortie) %}
                                             <form method="post" action="{{ path('sortie_desistement', parameters: {id: sortie.id}) }}">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('desistement_sortie_' ~ sortie.id) }}">
-                                                <button class="btn btn-secondary mb-1 w-100" type="submit">Se désister</button>
+                                                <button class="btn btn-primary mb-1 w-100" type="submit">Se désister</button>
                                             </form>
                                         {% endif %}
                                         {% if is_granted('sortie_modification', sortie) %}
                                             <a href="{{ path('sortie_modification', {'id': sortie.id}) }}"
-                                               class="btn btn-primary mb-1 w-100"
+                                               class="btn btn-outline-secondary mb-1 w-100"
                                                data-turbo="false">Modifier</a>
                                             <form method="post"
                                                   action="{{ path('sortie_publication', parameters: {id: sortie.id}) }}"
                                                   onsubmit="return confirm('Êtes-vous sûr de vouloir publier cette sortie ?');">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('publication_sortie_' ~ sortie.id) }}">
-                                                <button class="btn btn-secondary mb-1 w-100" type="submit">Publier</button>
+                                                <button class="btn btn-outline-success mb-1 w-100" type="submit">Publier</button>
                                             </form>
                                         {% endif %}
                                         {% if is_granted('sortie_annulation', sortie) %}
                                             <a href="{{ path('sortie_annulation', {'id': sortie.id}) }}"
-                                               class="btn btn-danger mb-1 w-100"
+                                               class="btn btn-outline-danger mb-1 w-100"
                                                data-turbo="false">Annuler</a>
                                         {% endif %}
                                     </td>

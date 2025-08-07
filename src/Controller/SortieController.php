@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Etat;
 use App\Entity\Sortie;
 use App\Form\FiltreSortiesType;
+use App\Form\SortieAnnulationType;
 use App\Form\SortieType;
 use App\Security\Voter\SortieVoter;
 use App\Service\SortieService;
@@ -112,12 +113,26 @@ final class SortieController extends AbstractController
     #[IsGranted('sortie_annulation', 'sortie')]
     public function annulationSortie(Sortie $sortie, Request $request): Response
     {
+        $sortieAnnulationForm = $this->createForm(SortieAnnulationType::class);
+        $sortieAnnulationForm->handleRequest($request);
 
+        if($sortieAnnulationForm->isSubmitted() && $sortieAnnulationForm->isValid()){
+            $motifAnnulation = $sortieAnnulationForm->get('motif')->getData();
+            $descriptionEtInfos = $sortie->getInfosSortie();
+            $descriptionEtInfos .= "\n SORTIE ANNULÉE : ";
+            $descriptionEtInfos .= $motifAnnulation;
 
-        $this->sortieService->gererEtatSortie($sortie, Etat::ANNULEE->value);
-        $this->addFlash('success', 'Cette sortie a bien été annulée.');
+            $sortie->setInfosSortie($descriptionEtInfos);
 
-        return $this->redirectToRoute('main_home');
+            $this->sortieService->gererEtatSortie($sortie, Etat::ANNULEE->value);
+            $this->addFlash('success', 'Cette sortie a bien été annulée.');
+            return $this->redirectToRoute('main_home');
+        }
+
+        return $this->render('sortie/annulation.html.twig', [
+            'sortie' => $sortie,
+            'sortieAnnulationForm' => $sortieAnnulationForm,
+        ]);
     }
 
     #[Route('/{id}/suppression', name: 'sortie_suppression', requirements: ["id" => "\d+"], methods: ["POST"])]
