@@ -22,32 +22,35 @@ final class MainController extends AbstractController
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        // Filtre : Récupération si existence du cookie
-        $filtreCookie = $request->cookies->get("filtreSortie");
-        if ($filtreCookie) {
-            $filtreSortie = unserialize($filtreCookie);
-        } else {
-        // Filtre : valeurs par défaut
-            $filtreSortie = new FiltreSortie();
-            $filtreSortie->setUser($user);
-            $filtreSortie->setCampus($user->getCampus());
-        }
+        // Valeurs par défaut du filtre
+        $filtreSortie = new FiltreSortie();
+        $filtreSortie->setUser($user);
+        $filtreSortie->setCampus($user->getCampus());
+
+        // Ecrasement du filtre si présent dans la session
+        $session = $request->getSession();
+        $filtreSortie = $session->get("filtre") ?: $filtreSortie;
 
         // Rechargement de l'objet Campus
         $filtreSortie->setCampus($campusRepository->find($filtreSortie->getCampus()->getId()));
 
         // Creation du formulaire de filtre
-        $filtreForm = $this->createForm(FiltreSortieType::class, $filtreSortie, ['csrf_protection' => false]);
+        $filtreForm = $this->createForm(FiltreSortieType::class, $filtreSortie);
         $filtreForm->handleRequest($request);
 
+        if ($filtreForm->isSubmitted() && $filtreForm->isValid()) {
+            $session->set("filtre", $filtreSortie);
+            $sorties = $sortieRepository->findByFilter($filtreSortie);
+            return $this->render('main/home.html.twig', [
+                "filtreForm" => $filtreForm,
+                "sorties" => $sorties,
+            ]);
+        }
+
         $sorties = $sortieRepository->findByFilter($filtreSortie);
-        $response = $this->render('main/home.html.twig', [
+        return $this->render('main/home.html.twig', [
             "filtreForm" => $filtreForm,
             "sorties" => $sorties,
         ]);
-
-        $cookie = new Cookie("filtreSortie", serialize($filtreSortie), strtotime('+1 day'));
-        $response->headers->setCookie($cookie);
-        return $response;
     }
 }

@@ -7,11 +7,11 @@
 
 {% block body %}
 	<section>
+		{{ form_start(filtreForm, {'attr': {'data-turbo': 'false'}})}}
 		<div class="container">
 			<div class="row">
 				<h5 class="ms-4">Filtrer les sorties</h5>
 				<div class="col-5">
-					{{ form_start(filtreForm, {'attr': {'data-turbo': 'false'}})}}
 					{{ form_row(filtreForm.campus) }}
 					{{ form_row(filtreForm.contient) }}
 					<div class="row">
@@ -31,12 +31,12 @@
 				</div>
 				<div class="col-2">
 					<button type="submit" class="btn btn-primary">Rechercher</button>
-					{{ form_end(filtreForm) }}
 				</div>
 			</div>
 		</div>
+		{{ form_end(filtreForm) }}
 	</section>
-    <hr>
+	<hr>
 	<section>
 		<div class="container">
             {% if sorties is not empty %}
