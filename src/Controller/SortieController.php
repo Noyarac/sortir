@@ -95,15 +95,31 @@ final class SortieController extends AbstractController
     public function publicationSortie(Sortie $sortie, Request $request): Response
     {
         // Vérifier le token CSRF
-        $tokenIsValid = $this->isCsrfTokenValid('suppression_sortie_' . $sortie->getId(), $request->request->get('_token'));
+        $tokenIsValid = $this->isCsrfTokenValid('publication_sortie_' . $sortie->getId(), $request->request->get('_token'));
         if (!$tokenIsValid) {
-            $this->addFlash('danger', "Cette sortie n'a pas pu être supprimé, jeton CSRF invalide");
+            $this->addFlash('danger', "Cette sortie n'a pas pu être publiée, jeton CSRF invalide");
             return $this->redirectToRoute('main_home');
         }
 
         $this->sortieService->gererEtatSortie($sortie, Etat::OUVERTE->value);
-
         $this->addFlash('success', 'Sortie publiée avec succès.');
+
+        return $this->redirectToRoute('main_home');
+    }
+
+    #[Route('/{id}/annulation', name: 'sortie_annulation', requirements: ["id" => "\d+"], methods: ["POST"])]
+    #[IsGranted('sortie_annulation', 'sortie')]
+    public function annulationSortie(Sortie $sortie, Request $request): Response
+    {
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('annulation_sortie_' . $sortie->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $this->addFlash('danger', "Cette sortie n'a pas pu être annulée, jeton CSRF invalide");
+            return $this->redirectToRoute('main_home');
+        }
+
+        $this->sortieService->gererEtatSortie($sortie, Etat::ANNULEE->value);
+        $this->addFlash('success', 'Cette sortie a bien été annulée.');
 
         return $this->redirectToRoute('main_home');
     }
@@ -115,7 +131,7 @@ final class SortieController extends AbstractController
         // Vérifier le token CSRF
         $tokenIsValid = $this->isCsrfTokenValid('suppression_sortie_' . $sortie->getId(), $request->request->get('_token'));
         if (!$tokenIsValid) {
-            $this->addFlash('danger', "Cette sortie n'a pas pu être supprimé, jeton CSRF invalide");
+            $this->addFlash('danger', "Cette sortie n'a pas pu être supprimée, jeton CSRF invalide");
             return $this->redirectToRoute('main_home');
         }
 

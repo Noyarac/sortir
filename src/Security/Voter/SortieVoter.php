@@ -16,10 +16,12 @@ final class SortieVoter extends Voter
     public const DESISTEMENT = 'sortie_desistement';
     public const MODIFICATION = 'sortie_modification';
 
+    public const ANNULATION = 'sortie_annulation';
+
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::INSCRIPTION, self::DESISTEMENT, self::MODIFICATION])
+        return in_array($attribute, [self::INSCRIPTION, self::DESISTEMENT, self::MODIFICATION, self::ANNULATION])
             && $subject instanceof \App\Entity\Sortie;
     }
 
@@ -43,6 +45,10 @@ final class SortieVoter extends Voter
 
             case self::MODIFICATION:
                 return $this->modification($sortie, $user);
+                break;
+            case self::ANNULATION:
+                return $this->annulation($sortie, $user);
+                break;
         }
         return false;
     }
@@ -66,5 +72,11 @@ final class SortieVoter extends Voter
         return
             $user === $sortie->getOrganisateur()
             && $sortie->getEtat() == Etat::EN_CREATION->value;
+    }
+
+    private function annulation(Sortie $sortie, User $user) : bool {
+        return
+            $user === $sortie->getOrganisateur()
+            && ($sortie->getEtat() == Etat::OUVERTE->value || $sortie->getEtat() == Etat::CLOTUREE->value);
     }
 }
