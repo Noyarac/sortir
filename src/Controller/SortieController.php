@@ -90,6 +90,24 @@ final class SortieController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/publication', name: 'sortie_publication', requirements: ["id" => "\d+"], methods: ["POST"])]
+    #[IsGranted('sortie_modification', 'sortie')]
+    public function publicationSortie(Sortie $sortie, Request $request): Response
+    {
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('suppression_sortie_' . $sortie->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $this->addFlash('danger', "Cette sortie n'a pas pu être supprimé, jeton CSRF invalide");
+            return $this->redirectToRoute('main_home');
+        }
+
+        $this->sortieService->gererEtatSortie($sortie, Etat::OUVERTE->value);
+
+        $this->addFlash('success', 'Sortie publiée avec succès.');
+
+        return $this->redirectToRoute('main_home');
+    }
+
     #[Route('/{id}/suppression', name: 'sortie_suppression', requirements: ["id" => "\d+"], methods: ["POST"])]
     #[IsGranted('sortie_modification', 'sortie')]
     public function suppressionSortie(Sortie $sortie, Request $request, EntityManagerInterface $entityManager): Response
