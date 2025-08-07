@@ -155,7 +155,7 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/{id}/inscription', name: 'sortie_inscription', requirements: ["id" => "\d+"], methods: ["POST"])]
-    public function inscription(Sortie $sortie, SortieService $sortieService, UserInterface $user): Response
+    public function inscription(Request $request, Sortie $sortie, SortieService $sortieService, UserInterface $user): Response
     {
         if (!$this->isGranted(SortieVoter::INSCRIPTION, $sortie)) {
             $this->addFlash("danger", "Il n'est pas possible de s'inscrire à cette sortie");
@@ -177,7 +177,7 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/{id}/desistement', name: 'sortie_desistement', requirements: ["id" => "\d+"], methods: ["POST"])]
-    public function desistement(Sortie $sortie, UserInterface $user, SortieService $sortieService): Response
+    public function desistement(Request $request, Sortie $sortie, UserInterface $user, SortieService $sortieService): Response
     {
         if (!$this->isGranted(SortieVoter::DESISTEMENT, $sortie)) {
             $this->addFlash("danger", "Il n'est pas possible de se désister de cette sortie");
