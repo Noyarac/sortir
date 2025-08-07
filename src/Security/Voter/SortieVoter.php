@@ -18,9 +18,11 @@ final class SortieVoter extends Voter
 
     public const ANNULATION = 'sortie_annulation';
 
+    public const BROUILLON = 'sortie_brouillon';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
+        return in_array($attribute, [self::INSCRIPTION, self::DESISTEMENT, self::MODIFICATION, self::BROUILLON])
         return in_array($attribute, [self::INSCRIPTION, self::DESISTEMENT, self::MODIFICATION, self::ANNULATION])
             && $subject instanceof \App\Entity\Sortie;
     }
@@ -49,6 +51,9 @@ final class SortieVoter extends Voter
             case self::ANNULATION:
                 return $this->annulation($sortie, $user);
                 break;
+            case self::BROUILLON:
+                return $this->brouillon($sortie, $user);
+                break;
         }
         return false;
     }
@@ -72,6 +77,12 @@ final class SortieVoter extends Voter
         return
             $user === $sortie->getOrganisateur()
             && $sortie->getEtat() == Etat::EN_CREATION->value;
+    }
+
+    private function brouillon(Sortie $sortie, User $user) : bool {
+        return
+            !($user != $sortie->getOrganisateur()
+            && $sortie->getEtat() == Etat::EN_CREATION->value);
     }
 
     private function annulation(Sortie $sortie, User $user) : bool {
