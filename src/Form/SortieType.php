@@ -33,19 +33,14 @@ class SortieType extends AbstractType
                 'widget' => 'single_text',
                 'label' => 'Date et heure de la sortie',
                 'input' => 'datetime_immutable',
-                'html5' => true,
-                'data' => (new \DateTimeImmutable('+2 days'))->setTime(18,0),
             ])
             ->add('dateLimiteInscription', DateType::class, [
                 'widget' => 'single_text',
                 'label' => "Date limite d'inscription",
                 'input' => 'datetime_immutable',
-                'html5' => true,
-                'data' => new \DateTimeImmutable('+1 day'),
             ])
             ->add('nbInscriptionMax', IntegerType::class, [
                 'label' => 'Nombre de places',
-                'data' => 10,
                 'attr' => [
                     'min' => 3,
                     'max' => 100,
@@ -53,7 +48,6 @@ class SortieType extends AbstractType
             ])
             ->add('duree', IntegerType::class, [
                 'label' => 'Durée (en minutes)',
-                'data' => 60,
                 'attr' => [
                     'min' => 15,
                     'max' => 4320,
