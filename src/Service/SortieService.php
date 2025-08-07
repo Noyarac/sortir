@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Etat;
 use App\Entity\Sortie;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -23,5 +24,18 @@ class SortieService
         $this->entityManager->flush();
     }
 
+    public function inscription(Sortie $sortie, User $user): bool {
+        try {
+            $sortie->addParticipant($user);
+            if (sizeof($sortie->getParticipants()) >= $sortie->getNbInscriptionMax()) {
+                $sortie->setEtat(Etat::CLOTUREE->value);
+            }
+            $this->entityManager->persist($sortie);
+            $this->entityManager->flush();
+        } catch (\Throwable $th) {
+            return false;
+        }
+        return true;
+    }
 
 }

@@ -111,16 +111,17 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/{id}/inscription', name: 'sortie_inscription', requirements: ["id" => "\d+"], methods: ["POST"])]
-    public function inscription(Sortie $sortie, UserInterface $user, EntityManagerInterface $em): Response
+    public function inscription(Sortie $sortie, SortieService $sortieService, UserInterface $user): Response
     {
         if (!$this->isGranted(SortieVoter::INSCRIPTION, $sortie)) {
             $this->addFlash("danger", "Il n'est pas possible de s'inscrire à cette sortie");
             return $this->redirectToRoute("main_home");
         }
-        $sortie->addParticipant($user);
-        $em->persist($sortie);
-        $em->flush();
-        $this->addFlash("success", "Vous vous êtes inscrit(e) avec succès.");
+        if ($sortieService->inscription($sortie, $user)) {
+            $this->addFlash("success", "Vous vous êtes inscrit(e) avec succès.");
+        } else {
+            $this->addFlash("danger", "Une erreur est survenue, votre inscription n'a pas été prise en compte.");
+        }
         return $this->redirectToRoute("main_home");
     }
 
