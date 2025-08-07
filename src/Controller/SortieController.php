@@ -126,16 +126,17 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/{id}/desistement', name: 'sortie_desistement', requirements: ["id" => "\d+"], methods: ["POST"])]
-    public function desistement(Sortie $sortie, UserInterface $user, EntityManagerInterface $em): Response
+    public function desistement(Sortie $sortie, UserInterface $user, SortieService $sortieService): Response
     {
         if (!$this->isGranted(SortieVoter::DESISTEMENT, $sortie)) {
             $this->addFlash("danger", "Il n'est pas possible de se désister de cette sortie");
             return $this->redirectToRoute("main_home");
         }
-        $sortie->removeParticipant($user);
-        $em->persist($sortie);
-        $em->flush();
-        $this->addFlash("success", "Vous vous êtes désisté(e) avec succès.");
+        if ($sortieService->desistement($sortie, $user)) {
+            $this->addFlash("success", "Vous vous êtes désisté(e) avec succès.");
+        } else {
+            $this->addFlash("danger", "Une erreur est survenue, votre désinscription n'a pas été prise en compte.");
+        }
         return $this->redirectToRoute("main_home");
     }
 
