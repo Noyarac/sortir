@@ -108,16 +108,11 @@ final class SortieController extends AbstractController
         return $this->redirectToRoute('main_home');
     }
 
-    #[Route('/{id}/annulation', name: 'sortie_annulation', requirements: ["id" => "\d+"], methods: ["POST"])]
+    #[Route('/{id}/annulation', name: 'sortie_annulation', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
     #[IsGranted('sortie_annulation', 'sortie')]
     public function annulationSortie(Sortie $sortie, Request $request): Response
     {
-        // Vérifier le token CSRF
-        $tokenIsValid = $this->isCsrfTokenValid('annulation_sortie_' . $sortie->getId(), $request->request->get('_token'));
-        if (!$tokenIsValid) {
-            $this->addFlash('danger', "Cette sortie n'a pas pu être annulée, jeton CSRF invalide");
-            return $this->redirectToRoute('main_home');
-        }
+
 
         $this->sortieService->gererEtatSortie($sortie, Etat::ANNULEE->value);
         $this->addFlash('success', 'Cette sortie a bien été annulée.');
@@ -145,12 +140,19 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/{id}/inscription', name: 'sortie_inscription', requirements: ["id" => "\d+"], methods: ["POST"])]
-    public function inscription(Sortie $sortie, UserInterface $user, EntityManagerInterface $em): Response
+    public function inscription(Sortie $sortie, UserInterface $user, EntityManagerInterface $em, Request $request): Response
     {
         if (!$this->isGranted(SortieVoter::INSCRIPTION, $sortie)) {
             $this->addFlash("danger", "Il n'est pas possible de s'inscrire à cette sortie");
             return $this->redirectToRoute("main_home");
         }
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('inscription_sortie_' . $sortie->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $this->addFlash('danger', "Inscription impossible, jeton CSRF invalide");
+            return $this->redirectToRoute('main_home');
+        }
+
         $sortie->addParticipant($user);
         $em->persist($sortie);
         $em->flush();
@@ -159,11 +161,17 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/{id}/desistement', name: 'sortie_desistement', requirements: ["id" => "\d+"], methods: ["POST"])]
-    public function desistement(Sortie $sortie, UserInterface $user, EntityManagerInterface $em): Response
+    public function desistement(Sortie $sortie, UserInterface $user, EntityManagerInterface $em, Request $request): Response
     {
         if (!$this->isGranted(SortieVoter::DESISTEMENT, $sortie)) {
             $this->addFlash("danger", "Il n'est pas possible de se désister de cette sortie");
             return $this->redirectToRoute("main_home");
+        }
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('desistement_sortie_' . $sortie->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $this->addFlash('danger', "Désistement impossible, jeton CSRF invalide");
+            return $this->redirectToRoute('main_home');
         }
         $sortie->removeParticipant($user);
         $em->persist($sortie);

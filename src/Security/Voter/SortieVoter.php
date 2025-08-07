@@ -22,8 +22,7 @@ final class SortieVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::INSCRIPTION, self::DESISTEMENT, self::MODIFICATION, self::BROUILLON])
-        return in_array($attribute, [self::INSCRIPTION, self::DESISTEMENT, self::MODIFICATION, self::ANNULATION])
+        return in_array($attribute, [self::INSCRIPTION, self::DESISTEMENT, self::MODIFICATION, self::ANNULATION, self::BROUILLON])
             && $subject instanceof \App\Entity\Sortie;
     }
 
