@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\DTO\FiltreSortie;
 use App\Form\FiltreSortiesType;
+use App\Form\FiltreSortieType;
 use App\Repository\CampusRepository;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,27 +19,37 @@ final class MainController extends AbstractController
     #[Route('/', name: 'main_home', methods: ["GET", "POST"])]
     public function home(Request $request, SortieRepository $sortieRepository, CampusRepository $campusRepository): Response
     {
-        $campus = null;
-        $filtreCampusId = $request->cookies->get('filtre-campus');
-        if ($filtreCampusId) {
-            $campus = $campusRepository->find($filtreCampusId);
+        // Filtre : valeurs par défaut
+        $filtreSortie = new FiltreSortie();
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+        $filtreSortie->setCampus($user->getCampus());
+
+        // Filtre : Ecrasement si cookie présent
+        $filtreCookie = $request->cookies->get("filtreSortie");
+        if ($filtreCookie) {
+            $filtreSortie = unserialize($filtreCookie);
         }
-        if (!$campus) {
-            /** @var \App\Entity\User $user */
-            $user = $this->getUser();
-            $campus = $user->getCampus();
-        }
-        $filtreForm = $this->createForm(FiltreSortiesType::class, ["campus" => $campus]);
+
+        // Rechargement de l'objet Campus
+        $filtreSortie->setCampus($campusRepository->find($filtreSortie->getCampus()->getId()));
+
+
+        $filtreForm = $this->createForm(FiltreSortieType::class, $filtreSortie);
         $filtreForm->handleRequest($request);
-        if ($filtreForm->isSubmitted() && $filtreForm->isValid()) {
-            $campus = $filtreForm->get("campus")->getData();
-        }
-        $sorties = $sortieRepository->findBy(["campus" => $campus]);
+
+        // if ($filtreForm->isSubmitted() && $filtreForm->isValid()) {
+        // }
+
+        $sorties = $sortieRepository->findBy([
+            "campus" => $filtreSortie->getCampus(),
+        ]);
         $response = $this->render('main/home.html.twig', [
             "filtreForm" => $filtreForm,
             "sorties" => $sorties,
         ]);
-        $cookie = new Cookie("filtre-campus", $campus->getId(), strtotime('+1 day'));
+
+        $cookie = new Cookie("filtreSortie", serialize($filtreSortie), strtotime('+1 day'));
         $response->headers->setCookie($cookie);
         return $response;
     }
