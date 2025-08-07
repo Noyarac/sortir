@@ -41,9 +41,7 @@ final class MainController extends AbstractController
         // if ($filtreForm->isSubmitted() && $filtreForm->isValid()) {
         // }
 
-        $sorties = $sortieRepository->findBy([
-            "campus" => $filtreSortie->getCampus(),
-        ]);
+        $sorties = $sortieRepository->findByFilter($filtreSortie);
         $response = $this->render('main/home.html.twig', [
             "filtreForm" => $filtreForm,
             "sorties" => $sorties,

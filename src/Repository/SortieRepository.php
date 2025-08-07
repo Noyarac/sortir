@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Sortie;
+use App\Form\DTO\FiltreSortie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +16,21 @@ class SortieRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Sortie::class);
     }
+
+       /**
+        * @return Sortie[] Returns an array of Sortie objects
+        */
+       public function findByFilter(FiltreSortie $filtreSortie): array
+       {
+           return $this->createQueryBuilder('s')
+               ->andWhere('s.campus = :campus')
+               ->setParameter('campus', $filtreSortie->getCampus())
+               ->orderBy('s.id', 'ASC')
+               ->setMaxResults(10)
+               ->getQuery()
+               ->getResult()
+           ;
+       }
 
     //    /**
     //     * @return Sortie[] Returns an array of Sortie objects
