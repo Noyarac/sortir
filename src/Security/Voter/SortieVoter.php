@@ -14,11 +14,12 @@ final class SortieVoter extends Voter
 {
     public const INSCRIPTION = 'sortie_inscription';
     public const DESISTEMENT = 'sortie_desistement';
+    public const MODIFICATION = 'sortie_modification';
     public const BROUILLON = 'sortie_brouillon';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::INSCRIPTION, self::DESISTEMENT, self::BROUILLON])
+        return in_array($attribute, [self::INSCRIPTION, self::DESISTEMENT, self::MODIFICATION, self::BROUILLON])
             && $subject instanceof \App\Entity\Sortie;
     }
 
@@ -39,6 +40,8 @@ final class SortieVoter extends Voter
             case self::DESISTEMENT:
                 return $this->desistement($sortie, $user);
                 break;
+            case self::MODIFICATION:
+                return $this->modification($sortie, $user);
             case self::BROUILLON:
                 return $this->brouillon($sortie, $user);
                 break;
@@ -59,6 +62,12 @@ final class SortieVoter extends Voter
             in_array($user, $sortie->getParticipants()->getValues())
             && in_array($sortie->getEtat(), [Etat::OUVERTE->value, Etat::CLOTUREE->value])
             && $sortie->getDateHeureDebut() > new DateTimeImmutable();
+    }
+
+    private function modification(Sortie $sortie, User $user) : bool {
+        return
+            $user === $sortie->getOrganisateur()
+            && $sortie->getEtat() == Etat::EN_CREATION->value;
     }
 
     private function brouillon(Sortie $sortie, User $user) : bool {

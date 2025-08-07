@@ -7,16 +7,21 @@ use App\Entity\Sortie;
 use App\Form\FiltreSortiesType;
 use App\Form\SortieType;
 use App\Security\Voter\SortieVoter;
+use App\Service\SortieService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route("/sortie")]
 final class SortieController extends AbstractController
 {
+
+    public function __construct(private readonly SortieService $sortieService){}
     #[Route('/{id}', name: 'sortie_details', requirements: ["id" => "\d+"], methods: ["GET"])]
     public function details(Sortie $sortie): Response
     {
@@ -25,38 +30,84 @@ final class SortieController extends AbstractController
         ]);
     }
     #[Route('/creation', name: 'sortie_creation', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
-    public function creationSortie(Request $request, EntityManagerInterface $entityManager): Response
+    public function creationSortie(Request $request): Response
     {
         $sortie = new Sortie();
         //Inutile de vérifier que $user existe car application entièrement protégée et seulement accessible à ROLE_USER
         $user = $this->getUser();
         $sortie->setOrganisateur($user);
         $sortie->setCampus($user->getCampus());
+        //Préremplissage du formulaire pour amélioration UX utilisateur
+        $sortie->setDateHeureDebut((new \DateTimeImmutable('+2 days'))->setTime(18,0),);
+        $sortie->setDateLimiteInscription(new \DateTimeImmutable('+1 day'));
+
 
         $sortieForm = $this->createForm(SortieType::class, $sortie);
 
         $sortieForm->handleRequest($request);
 
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
-            if($request->request->has('Enregistrer')){
-                $sortie->setEtat(Etat::EN_CREATION->value);
-                $this->addFlash("success", "Sortie créée avec succès! Attention, elle n'est pas encore publiée.");
-            }
-            else if ($request->request->has('Publier')){
-                $sortie->setEtat(Etat::OUVERTE->value);
-                $this->addFlash("success", "Sortie publiée avec succès!");
-            }
+            $etat = $request->request->get('action');
+            $this->sortieService->gererEtatSortie($sortie, $etat);
 
-            $entityManager->persist($sortie);
-            $entityManager->flush();
+            $message = $etat === Etat::OUVERTE->value
+                ? "Sortie créée avec succès!"
+                : "Sortie modifiée avec succès! Attention, elle n'est pas encore publiée.";
 
+            $this->addFlash("success", $message);
             return $this->redirectToRoute('main_home');
-
         }
 
-        return $this->render('sortie/creation.html.twig', [
+        return $this->render('sortie/creation-modification.html.twig', [
             'sortieForm' => $sortieForm,
+            'isModification' => false,
         ]);
+    }
+
+    #[Route('/{id}/modification', name: 'sortie_modification', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
+    #[IsGranted('sortie_modification', 'sortie')]
+    public function modificationSortie(Sortie $sortie, Request $request): Response
+    {
+
+        $sortieForm = $this->createForm(SortieType::class, $sortie);
+        $sortieForm->handleRequest($request);
+
+        if($sortieForm->isSubmitted() && $sortieForm->isValid()){
+            $etat = $request->request->get('action');
+            $this->sortieService->gererEtatSortie($sortie, $etat);
+
+            $message = $etat === Etat::OUVERTE->value
+                ? "Sortie publiée avec succès!"
+                : "Sortie modifiée avec succès! Attention, elle n'est pas encore publiée.";
+
+            $this->addFlash("success", $message);
+            return $this->redirectToRoute('main_home');
+        }
+
+        return $this->render('sortie/creation-modification.html.twig', [
+            'sortieForm' => $sortieForm,
+            'sortie' => $sortie,
+            'isModification' => true,
+        ]);
+    }
+
+    #[Route('/{id}/suppression', name: 'sortie_suppression', requirements: ["id" => "\d+"], methods: ["POST"])]
+    #[IsGranted('sortie_modification', 'sortie')]
+    public function suppressionSortie(Sortie $sortie, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('suppression_sortie_' . $sortie->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $this->addFlash('danger', "Cette sortie n'a pas pu être supprimé, jeton CSRF invalide");
+            return $this->redirectToRoute('main_home');
+        }
+
+        $entityManager->remove($sortie);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Sortie supprimée avec succès.');
+
+        return $this->redirectToRoute('main_home');
     }
 
     #[Route('/{id}/inscription', name: 'sortie_inscription', requirements: ["id" => "\d+"], methods: ["POST"])]
