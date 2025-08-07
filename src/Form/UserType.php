@@ -31,12 +31,24 @@ class UserType extends AbstractType
             ])
             ->add('pseudo', TextType::class, [
                 'label' => 'Pseudo',
+                'attr' => [
+                    'minlength' => 2,
+                    'maxlength' => 50,
+                ],
             ])
             ->add('prenom', TextType::class, [
                 'label' => 'Prénom',
+                'attr' => [
+                    'minlength' => 2,
+                    'maxlength' => 50,
+                ],
             ])
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
+                'attr' => [
+                    'minlength' => 2,
+                    'maxlength' => 50,
+                ],
             ])
             ->add('telephone', TextType::class, [
                 'label' => 'Téléphone',

@@ -64,8 +64,8 @@
                         <dt>Liste des participants inscrits</dt>
                         <dd>
                             <ul>
-                                {% for user in sortie.participants %}
-                                    <li><a href="{{ path('profil_afficher', parameters: {id: user.id}) }}">{{user.nom}}</a></li>
+                                {% for participant in sortie.participants %}
+                                    <li><a href="{{ path('profil_afficher', parameters: {id: participant.id}) }}">{{participant.pseudo}}</a></li>
                                 {% endfor %}
                             </ul>
                         </dd>
@@ -75,4 +75,4 @@
     </div>
 {% endblock %}
 
-{% block title %}Détail d'une sortie | {{parent()}} {% endblock %}
+{% block title %}{{parent()}} | Détail d'une sortie {% endblock %}
