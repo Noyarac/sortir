@@ -27,10 +27,19 @@
             {% endif %}
             {% for label,messages in app.flashes %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ label }} mt-2 px-2">{{ message }}</div>
+                    <div class="alert alert-{{ label }} mt-2 px-2 flash-message">{{ message }}</div>
                 {% endfor %}
             {% endfor %}
             {% block body %}{% endblock %}
         </main>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const flashMessages = document.querySelectorAll('.flash-message');
+                console.log("les messages flash devraient être supprimés");
+                flashMessages.forEach((flash) => {
+                    setTimeout(() => {flash.remove();}, 5000);
+                });
+            });
+        </script>
     </body>
 </html>
