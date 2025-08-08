@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Etat;
 use App\Entity\Sortie;
 use App\Form\DTO\FiltreSortie;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -66,6 +67,15 @@ class SortieRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    public function findAllToCloture(): array {
+        return $this->createQueryBuilder('s')
+            ->andWhere("s.etat = '"  . Etat::OUVERTE->value . "'")
+            ->andWhere("s.dateLimiteInscription < :date")
+            ->setParameter('date', new DateTimeImmutable())
+            ->getQuery()
+            ->getResult();
     }
 
     //    /**

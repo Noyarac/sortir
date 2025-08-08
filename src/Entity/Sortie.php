@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Repository\SortieRepository;
 use App\Validator\DatesDebutEtLimiteInscription;
-
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -141,6 +141,9 @@ class Sortie
 
     public function getEtat(): ?string
     {
+        if ($this->etat == Etat::OUVERTE->value && $this->dateLimiteInscription < new DateTimeImmutable()) {
+            $this->setEtat(Etat::CLOTUREE->value);
+        }
         return $this->etat;
     }
 
