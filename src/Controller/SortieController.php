@@ -31,7 +31,7 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/creation', name: 'sortie_creation', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
-    public function creationSortie(Request $request): Response
+    public function creationSortie(Request $request, EntityManagerInterface $entityManager): Response
     {
         $sortie = new Sortie();
         //Inutile de vérifier que $user existe car application entièrement protégée et seulement accessible à ROLE_USER
@@ -50,7 +50,10 @@ final class SortieController extends AbstractController
 
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
             $etat = $request->request->get('action');
-            $this->sortieService->gererEtatSortie($sortie, $etat);
+            $sortie->setEtat($etat);
+
+            $entityManager->persist($sortie);
+            $entityManager->flush();
 
             $message = $etat === Etat::OUVERTE->value
                 ? "Sortie créée avec succès!"
@@ -68,7 +71,7 @@ final class SortieController extends AbstractController
 
     #[Route('/{id}/modification', name: 'sortie_modification', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
     #[IsGranted('sortie_modification', 'sortie')]
-    public function modificationSortie(Sortie $sortie, Request $request): Response
+    public function modificationSortie(Sortie $sortie, Request $request, EntityManagerInterface $entityManager): Response
     {
 
         $sortieForm = $this->createForm(SortieType::class, $sortie);
@@ -76,7 +79,9 @@ final class SortieController extends AbstractController
 
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
             $etat = $request->request->get('action');
-            $this->sortieService->gererEtatSortie($sortie, $etat);
+            $sortie->setEtat($etat);
+
+            $entityManager->flush();
 
             $message = $etat === Etat::OUVERTE->value
                 ? "Sortie publiée avec succès!"
