@@ -82,6 +82,15 @@ class SortieRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    public function findAllToCloture(): array {
+        return $this->createQueryBuilder('s')
+            ->andWhere("s.etat = '"  . Etat::OUVERTE->value . "'")
+            ->andWhere("s.dateLimiteInscription < :date")
+            ->setParameter('date', new DateTimeImmutable())
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Sortie[] Returns an array of Sortie objects
     //     */
