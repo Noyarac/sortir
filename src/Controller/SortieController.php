@@ -49,7 +49,12 @@ final class SortieController extends AbstractController
 
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
             $etat = $request->request->get('action');
-            $this->sortieService->gererEtatSortie($sortie, $etat);
+            try {
+                $this->sortieService->gererEtatSortie($sortie, $etat);
+            } catch (\InvalidArgumentException $e) {
+                $this->addFlash('danger', 'Une erreur est survenue, veuillez réessayer plus tard');
+                return $this->redirectToRoute('sortie_creation');
+            }
 
             $message = $etat === Etat::OUVERTE->value
                 ? "Sortie créée avec succès!"
@@ -75,7 +80,12 @@ final class SortieController extends AbstractController
 
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
             $etat = $request->request->get('action');
-            $this->sortieService->gererEtatSortie($sortie, $etat);
+            try {
+                $this->sortieService->gererEtatSortie($sortie, $etat);
+            } catch (\InvalidArgumentException $e) {
+                $this->addFlash('danger', 'Une erreur est survenue, veuillez réessayer plus tard');
+                return $this->redirectToRoute('sortie_creation');
+            }
 
             $message = $etat === Etat::OUVERTE->value
                 ? "Sortie publiée avec succès!"

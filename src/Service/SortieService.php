@@ -18,6 +18,9 @@ class SortieService
     public function gererEtatSortie(Sortie $sortie, ?string $etat = null) : void
     {
         if ($etat !== null) {
+            if (!in_array($etat, array_column(Etat::cases(), 'value'), true)) {
+                throw new \InvalidArgumentException("État non autorisé : $etat");
+            }
             $sortie->setEtat($etat);
         }
 
