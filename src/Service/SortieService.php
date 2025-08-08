@@ -12,15 +12,6 @@ class SortieService
 {
 
     public function __construct(private readonly EntityManagerInterface $entityManager){}
-    public function gererEtatSortie(Sortie $sortie, ?string $etat = null) : void
-    {
-        if ($etat !== null) {
-            $sortie->setEtat($etat);
-        }
-
-        $this->entityManager->persist($sortie);
-        $this->entityManager->flush();
-    }
 
     public function inscription(Sortie $sortie, User $user): bool {
         try {
@@ -52,6 +43,17 @@ class SortieService
             return false;
         }
         return true;
+    }
+
+    public function mettreAJourSortiesHistorisees(): int
+    {
+        $sortieRepository = $this->entityManager->getRepository(Sortie::class);
+        $sortiesAHistoriser = $sortieRepository->findSortiesTermineesDepuisPlusDUnMois(1);
+        foreach ($sortiesAHistoriser as $sortie) {
+            $sortie->setEtat(Etat::HISTORISEE->value);
+        }
+        $this->entityManager->flush();
+        return count($sortiesAHistoriser);
     }
 
 }
