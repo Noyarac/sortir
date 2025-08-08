@@ -19,9 +19,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route("/sortie")]
 final class SortieController extends AbstractController
 {
-
-    public function __construct(private readonly SortieService $sortieService){}
-
     #[Route('/{id}', name: 'sortie_details', requirements: ["id" => "\d+"], methods: ["GET"])]
     public function details(Sortie $sortie): Response
     {

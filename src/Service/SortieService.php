@@ -48,7 +48,7 @@ class SortieService
     public function mettreAJourSortiesHistorisees(): int
     {
         $sortieRepository = $this->entityManager->getRepository(Sortie::class);
-        $sortiesAHistoriser = $sortieRepository->findSortiesTermineesDepuisPlusDUnMois(1);
+        $sortiesAHistoriser = $sortieRepository->findSortiesTermineesDepuisPlusDeNbMois(1);
         foreach ($sortiesAHistoriser as $sortie) {
             $sortie->setEtat(Etat::HISTORISEE->value);
         }

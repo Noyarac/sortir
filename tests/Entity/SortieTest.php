@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Entity;
 
 use App\Entity\Etat;
 use App\Entity\Sortie;
@@ -21,7 +21,7 @@ class SortieTest extends TestCase
 
         $repository = $this->createMock(SortieRepository::class);
         $repository->expects($this->once())
-            ->method('findSortiesTermineesDepuisPlusDUnMois')
+            ->method('findSortiesTermineesDepuisPlusDeNbMois')
             ->with(1)
             ->willReturn([$sortie1, $sortie2]);
 

@@ -70,7 +70,7 @@ class SortieRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findSortiesTermineesDepuisPlusDUnMois(int $nbMois) : array
+    public function findSortiesTermineesDepuisPlusDeNbMois(int $nbMois) : array
     {
         $queryBuilder = $this->createQueryBuilder('s')
             ->andWhere('s.dateHeureDebut <= :limite')
