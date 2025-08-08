@@ -36,7 +36,7 @@ class HistoriserSortiesCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $nbSortiesHistorisees = $this->sortieService->mettreAjourSortiesHistorisees();
+        $nbSortiesHistorisees = $this->sortieService->mettreAJourSortiesHistorisees();
 
         $io->success($nbSortiesHistorisees."sortie(s) ont été historisées");
 
