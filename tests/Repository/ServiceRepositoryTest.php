@@ -7,18 +7,40 @@ use App\Entity\Etat;
 use App\Entity\Lieu;
 use App\Entity\Sortie;
 use App\Entity\User;
+use App\Form\DTO\FiltreSortie;
+use App\Repository\CampusRepository;
+use App\Repository\LieuRepository;
+use App\Repository\SortieRepository;
+use App\Repository\UserRepository;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ServiceRepositoryTest extends KernelTestCase
 {
+    protected static ?EntityManagerInterface $entityManager = null;
+    protected static ?SortieRepository $sortieRepository = null;
+    protected static ?CampusRepository $campusRepository = null;
+    protected static ?LieuRepository $lieuRepository = null;
+    protected static ?UserRepository $userRepository = null;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::bootKernel();
+        self::$entityManager = self::$kernel->getContainer()->get('doctrine')->getManager();
+        self::$sortieRepository = self::$entityManager->getRepository(Sortie::class);
+        self::$campusRepository = self::$entityManager->getRepository(Campus::class);
+        self::$lieuRepository = self::$entityManager->getRepository(Lieu::class);
+        self::$userRepository = self::$entityManager->getRepository(User::class);
+    }
+
     public function test_findSortiesTermineesDepuisPlusDeNbMois(): void
     {
-        $kernel = self::bootKernel();
-        $entityManager = $kernel->getContainer()->get('doctrine')->getManager();
-        $sortieRepository = $entityManager->getRepository(Sortie::class);
-        $campus = $entityManager->getRepository(Campus::class)->find(1);
-        $lieu = $entityManager->getRepository(Lieu::class)->find(1);
-        $user = $entityManager->getRepository(User::class)->find(1);
+        $entityManager = self::$entityManager;
+        $sortieRepository = self::$sortieRepository;
+        $campus = self::$campusRepository->find(1);
+        $lieu = self::$lieuRepository->find(1);
+        $user = self::$userRepository->find(1);
 
         $sortieHistorisable = new Sortie();
         $sortieHistorisable->setNom('Sortie Historisable');
@@ -56,6 +78,85 @@ class ServiceRepositoryTest extends KernelTestCase
         $entityManager->remove($sortieNonHistorisable);
         $entityManager->remove($sortieHistorisable);
         $entityManager->flush();
+    }
 
+    public function test_Cherche_sortie_a_cloturer(): void
+    {
+        $entityManager = self::$entityManager;
+        $sortieRepository = self::$sortieRepository;
+        $sortie = new Sortie();
+        $sortie->setDateLimiteInscription(new DateTimeImmutable("-1 week"));
+        $sortie->setNom("Sortie à tester");
+        $sortie->setDateHeureDebut(new DateTimeImmutable("3 weeks"));
+        $sortie->setNbInscriptionMax(15);
+        $sortie->setDuree(60);
+        $sortie->setInfosSortie('Cette sortie est à cloturer');
+        $sortie->setCampus(self::$campusRepository->findOneBy([]));
+        $sortie->setLieu(self::$lieuRepository->findOneBy([]));
+        $sortie->setOrganisateur(self::$userRepository->findOneBy([]));
+        $sortie->setEtat(Etat::OUVERTE->value);
+        $entityManager->persist($sortie);
+
+        $sortie2 = new Sortie();
+        $sortie2->setDateLimiteInscription(new DateTimeImmutable("1 week"));
+        $sortie2->setNom("Sortie groupe temoin");
+        $sortie2->setDateHeureDebut(new DateTimeImmutable("3 weeks"));
+        $sortie2->setNbInscriptionMax(15);
+        $sortie2->setDuree(60);
+        $sortie2->setInfosSortie("Cette sortie n'est pas à cloturer");
+        $sortie2->setCampus(self::$campusRepository->findOneBy([]));
+        $sortie2->setLieu(self::$lieuRepository->findOneBy([]));
+        $sortie2->setOrganisateur(self::$userRepository->findOneBy([]));
+        $sortie2->setEtat(Etat::OUVERTE->value);
+        $entityManager->persist($sortie2);
+
+        $entityManager->flush();
+        $results = $sortieRepository->findAllToCloture();
+
+        $this->assertContains($sortie, $results);
+        $this->assertNotContains($sortie2, $results);
+    }
+
+    public function test_Cherche_sorties_filtrees(): void
+    {
+        $entityManager = self::$entityManager;
+        $sortieRepository = self::$sortieRepository;
+
+        $campus = self::$campusRepository->findOneBy([]);
+        $lieu = self::$lieuRepository->findOneBy([]);
+        $organisateur = self::$userRepository->findOneBy([]);
+
+        $sortie = new Sortie();
+        $sortie->setDateLimiteInscription(new DateTimeImmutable("1 week"));
+        $sortie->setNom("Sortie à tester");
+        $sortie->setDateHeureDebut(new DateTimeImmutable("3 weeks"));
+        $sortie->setNbInscriptionMax(15);
+        $sortie->setDuree(60);
+        $sortie->setInfosSortie('Cette sortie spéciale doit être retournée');
+        $sortie->setCampus($campus);
+        $sortie->setLieu($lieu);
+        $sortie->setOrganisateur($organisateur);
+        $sortie->setEtat(Etat::OUVERTE->value);
+        $entityManager->persist($sortie);
+
+        $sortie2 = new Sortie();
+        $sortie2->setDateLimiteInscription(new DateTimeImmutable("2 weeks"));
+        $sortie2->setNom("Sortie groupe temoin");
+        $sortie2->setDateHeureDebut(new DateTimeImmutable("3 weeks"));
+        $sortie2->setNbInscriptionMax(15);
+        $sortie2->setDuree(60);
+        $sortie2->setInfosSortie("Cette sortie ne doit pas être retournée");
+        $sortie2->setCampus($campus);
+        $sortie2->setLieu($lieu);
+        $sortie2->setOrganisateur($organisateur);
+        $sortie2->setEtat(Etat::OUVERTE->value);
+        $entityManager->persist($sortie2);
+
+        $entityManager->flush();
+
+        $filtre = new FiltreSortie($campus, "tester");
+        $results = $sortieRepository->findByFilter($filtre);
+        $this->assertContains($sortie, $results);
+        $this->assertNotContains($sortie2, $results);
     }
 }
