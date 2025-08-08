@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Integration\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class SortieTest extends WebTestCase
+class SortieControllerTest extends WebTestCase
 {
     public function testSomething(): void
     {
