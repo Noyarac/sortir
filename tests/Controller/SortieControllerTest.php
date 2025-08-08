@@ -48,9 +48,9 @@ class SortieControllerTest extends WebTestCase
             'sortie[nom]' => 'Balade dans le parc',
             'sortie[dateHeureDebut]' => (new \DateTimeImmutable('now'))->modify('+1 month')->format('Y-m-d\TH:i'),
             'sortie[dateLimiteInscription]' => (new \DateTimeImmutable('now'))->modify('+1 month')->modify('-2 days')->format('Y-m-d\TH:i'),
-            'sortie[nbInscriptionsMax]' => '15',
+            'sortie[nbInscriptionMax]' => '15',
             'sortie[duree]' => '60',
-            'sortie[lieu]' => $lieu->getNom(),
+            'sortie[lieu]' => $lieu->getId(),
             'sortie[infosSortie]' => "Balade dans le parc",
         ]);
 

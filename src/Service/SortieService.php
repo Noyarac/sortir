@@ -29,6 +29,9 @@ class SortieService
 
     public function desistement(Sortie $sortie, User $user): bool {
         try {
+            // Si l'utilisateur ne fait pas partie des participants
+            if (!in_array($user, $sortie->getParticipants()->toArray())) return false;
+
             $sortie->removeParticipant($user);
             if (
                 sizeof($sortie->getParticipants()) < $sortie->getNbInscriptionMax()

@@ -97,7 +97,7 @@ final class SortieController extends AbstractController
 
     #[Route('/{id}/publication', name: 'sortie_publication', requirements: ["id" => "\d+"], methods: ["POST"])]
     #[IsGranted('sortie_modification', 'sortie')]
-    public function publicationSortie(Sortie $sortie, Request $request): Response
+    public function publicationSortie(Sortie $sortie, Request $request, EntityManagerInterface $entityManager): Response
     {
         // Vérifier le token CSRF
         $tokenIsValid = $this->isCsrfTokenValid('publication_sortie_' . $sortie->getId(), $request->request->get('_token'));
@@ -106,7 +106,8 @@ final class SortieController extends AbstractController
             return $this->redirectToRoute('main_home');
         }
 
-        $this->sortieService->gererEtatSortie($sortie, Etat::OUVERTE->value);
+        $sortie->setEtat(Etat::OUVERTE->value);
+        $entityManager->flush();
         $this->addFlash('success', 'Sortie publiée avec succès.');
 
         return $this->redirectToRoute('main_home');
@@ -114,7 +115,7 @@ final class SortieController extends AbstractController
 
     #[Route('/{id}/annulation', name: 'sortie_annulation', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
     #[IsGranted('sortie_annulation', 'sortie')]
-    public function annulationSortie(Sortie $sortie, Request $request): Response
+    public function annulationSortie(Sortie $sortie, Request $request, EntityManagerInterface $entityManager): Response
     {
         $sortieAnnulationForm = $this->createForm(SortieAnnulationType::class);
         $sortieAnnulationForm->handleRequest($request);
@@ -127,7 +128,8 @@ final class SortieController extends AbstractController
 
             $sortie->setInfosSortie($descriptionEtInfos);
 
-            $this->sortieService->gererEtatSortie($sortie, Etat::ANNULEE->value);
+            $sortie->setEtat(Etat::ANNULEE->value);
+            $entityManager->flush();
             $this->addFlash('success', 'Cette sortie a bien été annulée.');
             return $this->redirectToRoute('main_home');
         }
