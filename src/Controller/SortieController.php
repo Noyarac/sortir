@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Etat;
 use App\Entity\Sortie;
-use App\Form\FiltreSortiesType;
 use App\Form\SortieAnnulationType;
 use App\Form\SortieType;
 use App\Security\Voter\SortieVoter;
@@ -14,7 +13,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -23,6 +21,7 @@ final class SortieController extends AbstractController
 {
 
     public function __construct(private readonly SortieService $sortieService){}
+
     #[Route('/{id}', name: 'sortie_details', requirements: ["id" => "\d+"], methods: ["GET"])]
     public function details(Sortie $sortie): Response
     {
@@ -30,11 +29,13 @@ final class SortieController extends AbstractController
             "sortie" => $sortie,
         ]);
     }
+
     #[Route('/creation', name: 'sortie_creation', requirements: ["id" => "\d+"], methods: ["GET","POST"])]
     public function creationSortie(Request $request): Response
     {
         $sortie = new Sortie();
         //Inutile de vérifier que $user existe car application entièrement protégée et seulement accessible à ROLE_USER
+        /** @var \App\Entity\User $user */
         $user = $this->getUser();
         $sortie->setOrganisateur($user);
         $sortie->setCampus($user->getCampus());
