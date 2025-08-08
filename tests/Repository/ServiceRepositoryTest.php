@@ -7,10 +7,6 @@ use App\Entity\Etat;
 use App\Entity\Lieu;
 use App\Entity\Sortie;
 use App\Entity\User;
-use App\Repository\CampusRepository;
-use App\Repository\LieuRepository;
-use App\Repository\SortieRepository;
-use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ServiceRepositoryTest extends KernelTestCase
@@ -20,9 +16,9 @@ class ServiceRepositoryTest extends KernelTestCase
         $kernel = self::bootKernel();
         $entityManager = $kernel->getContainer()->get('doctrine')->getManager();
         $sortieRepository = $entityManager->getRepository(Sortie::class);
-        $campus = $entityManager->getRepository(Campus::class)->findAll();
-        $lieux = $entityManager->getRepository(Lieu::class)->findAll();
-        $users = $entityManager->getRepository(User::class)->findAll();
+        $campus = $entityManager->getRepository(Campus::class)->find(1);
+        $lieu = $entityManager->getRepository(Lieu::class)->find(1);
+        $user = $entityManager->getRepository(User::class)->find(1);
 
         $sortieHistorisable = new Sortie();
         $sortieHistorisable->setNom('Sortie Historisable');
@@ -31,9 +27,9 @@ class ServiceRepositoryTest extends KernelTestCase
         $sortieHistorisable->setNbInscriptionMax(15);
         $sortieHistorisable->setDuree(60);
         $sortieHistorisable->setInfosSortie('Cette sortie est historisable');
-        $sortieHistorisable->setCampus($campus[0]);
-        $sortieHistorisable->setLieu($lieux[0]);
-        $sortieHistorisable->setOrganisateur($users[0]);
+        $sortieHistorisable->setCampus($campus);
+        $sortieHistorisable->setLieu($lieu);
+        $sortieHistorisable->setOrganisateur($user);
         $sortieHistorisable->setEtat(Etat::TERMINEE->value);
         $entityManager->persist($sortieHistorisable);
 
@@ -44,9 +40,9 @@ class ServiceRepositoryTest extends KernelTestCase
         $sortieNonHistorisable->setNbInscriptionMax(15);
         $sortieNonHistorisable->setDuree(60);
         $sortieNonHistorisable->setInfosSortie('Cette sortie est non historisable');
-        $sortieNonHistorisable->setCampus($campus[0]);
-        $sortieNonHistorisable->setLieu($lieux[0]);
-        $sortieNonHistorisable->setOrganisateur($users[0]);
+        $sortieNonHistorisable->setCampus($campus);
+        $sortieNonHistorisable->setLieu($lieu);
+        $sortieNonHistorisable->setOrganisateur($user);
         $sortieNonHistorisable->setEtat(Etat::TERMINEE->value);
         $entityManager->persist($sortieNonHistorisable);
 
@@ -56,6 +52,10 @@ class ServiceRepositoryTest extends KernelTestCase
 
         $this->assertCount(1, $results);
         $this->assertSame($sortieHistorisable->getId(), $results[0]->getId());
+
+        $entityManager->remove($sortieNonHistorisable);
+        $entityManager->remove($sortieHistorisable);
+        $entityManager->flush();
 
     }
 }
