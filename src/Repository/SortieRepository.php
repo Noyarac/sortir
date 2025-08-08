@@ -25,7 +25,9 @@ class SortieRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s')
             ->andWhere('s.campus = :campus')
-            ->setParameter('campus', $filtreSortie->getCampus());
+            ->setParameter('campus', $filtreSortie->getCampus())
+            ->andWhere('s.etat != :etatHistorisee')
+            ->setParameter('etatHistorisee', Etat::HISTORISEE->value);
         if ($filtreSortie->getContient()) {
             $qb->andWhere($qb->expr()->like('s.nom', ':contient'))
                 ->setParameter("contient", "%" . $filtreSortie->getContient() . "%");
@@ -66,6 +68,18 @@ class SortieRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    public function findSortiesTermineesDepuisPlusDUnMois(int $nbMois) : array
+    {
+        $queryBuilder = $this->createQueryBuilder('s')
+            ->andWhere('s.dateHeureDebut <= :limite')
+            ->setParameter('limite', (new \DateTime())->modify('-'.$nbMois.'months'))
+            ->andWhere('s.etat IN (:etats)')
+            ->setParameter('etats', [Etat::TERMINEE->value, Etat::ANNULEE->value]);
+
+        $query = $queryBuilder->getQuery();
+        return $query->getResult();
     }
 
     //    /**

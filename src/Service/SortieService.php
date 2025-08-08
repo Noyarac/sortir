@@ -57,4 +57,15 @@ class SortieService
         return true;
     }
 
+    public function mettreAjourSortiesHistorisees(): int
+    {
+        $sortieRepository = $this->entityManager->getRepository(Sortie::class);
+        $sortiesAHistoriser = $sortieRepository->findSortiesTermineesDepuisPlusDUnMois(1);
+        foreach ($sortiesAHistoriser as $sortie) {
+            $sortie->setEtat(Etat::HISTORISEE->value);
+        }
+        $this->entityManager->flush();
+        return count($sortiesAHistoriser);
+    }
+
 }
