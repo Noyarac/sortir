@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Service;
+namespace App\Tests\Service;
 
 use App\Entity\Etat;
 use App\Entity\Sortie;
