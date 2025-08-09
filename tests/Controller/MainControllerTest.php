@@ -16,7 +16,7 @@ class MainControllerTest extends WebTestCase
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
         //simuler la connexion d'un utilisateur
-        $user = $entityManager->getRepository(User::class)->find(1);
+        $user = $entityManager->getRepository(User::class)->findOneBy([]);
         $this->client->loginUser($user);
         //accéder à la page de création GET
         $this->client->request('GET', '/');

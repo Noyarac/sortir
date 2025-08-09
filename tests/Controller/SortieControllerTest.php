@@ -19,8 +19,8 @@ class SortieControllerTest extends WebTestCase
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
         //simuler la connexion d'un utilisateur
-        $user = $entityManager->getRepository(User::class)->find(1);
-        $lieu = $entityManager->getRepository(Lieu::class)->find(1);
+        $user = $entityManager->getRepository(User::class)->findOneBy([]);
+        $lieu = $entityManager->getRepository(Lieu::class)->findOneBy([]);
         $this->client->loginUser($user);
         //accéder à la page de création GET
         $this->client->request('GET', '/sortie/creation');

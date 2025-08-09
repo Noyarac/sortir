@@ -16,7 +16,7 @@ class SecurityControllerTest extends WebTestCase
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
         //simuler la connexion d'un utilisateur
-        $user = $entityManager->getRepository(User::class)->find(1);
+        $user = $entityManager->getRepository(User::class)->findOneBy([]);
 
         $this->client->request('GET', '/');
         $this->client->followRedirect();
@@ -32,7 +32,7 @@ class SecurityControllerTest extends WebTestCase
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
         //simuler la connexion d'un utilisateur
-        $user = $entityManager->getRepository(User::class)->find(1);
+        $user = $entityManager->getRepository(User::class)->findOneBy([]);
 
         $this->client->request('GET', '/');
         $this->client->followRedirect();
@@ -48,7 +48,7 @@ class SecurityControllerTest extends WebTestCase
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
         //simuler la connexion d'un utilisateur
-        $user = $entityManager->getRepository(User::class)->find(2);
+        $user = $entityManager->getRepository(User::class)->findOneBy([]);
         $user->setActif(false);
         $entityManager->flush();
 
@@ -71,10 +71,6 @@ class SecurityControllerTest extends WebTestCase
 
         // Vérifier qu'il n'y a pas de lien logout (pas connecté)
         $this->assertSelectorNotExists('a.nav-link[href="/logout"]');
-
-        $user->setActif(true);
-        $entityManager->flush();
-        $entityManager->clear();
     }
 
 }
