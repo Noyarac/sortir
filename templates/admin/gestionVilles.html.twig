@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{parent()}}| Villes{% endblock %}
+
+{% block body %}
+    <section>
+        {{ form_start(filtreVilleForm, {'attr': {'data-turbo': 'false'}})}}
+        <div class="container">
+            <div class="row align-items-end">
+                <h5>Filtrer les villes</h5>
+                <div class="col-6">
+                    {{ form_widget(filtreVilleForm) }}
+                </div>
+                <div class="col-auto mb-3">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </div>
+                {{ form_end(filtreVilleForm) }}
+            </div>
+        </div>
+    </section>
+    <hr>
+    <section>
+        <div class="container">
+            {{ form_start(villeForm, {'attr': {'data-turbo': 'false'}}) }}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Ville</th>
+                    <th>Code postal</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+
+                        <td>
+                            {{ form_row(villeForm.nom, {'label':false}) }}
+                        </td>
+                        <td>
+                            {{ form_row(villeForm.codePostal,{'label':false}) }}
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                        </td>
+
+                    </tr>
+                    {% if villes is not empty %}
+                        {% for ville in villes %}
+                            <tr>
+                                <td class="col-6">{{ ville.nom | capitalize }}</td>
+                                <td class="col-3">{{ ville.codePostal }}</td>
+                                <td class="col-auto">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+            {{ form_end(villeForm) }}
+            {% if villes is empty %}
+                <p>Aucune ville ne correspond au critère de recherche.</p>
+            {% endif %}
+    </section>
+{% endblock %}
+

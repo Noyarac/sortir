@@ -23,14 +23,14 @@ class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        if ($options['isAdmin']) {
+        if($options['isAdmin']){
             $builder
                 ->add('actif', CheckboxType::class, [
                     'label' => 'Compte actif',
                     'required' => false,
                 ]);
         }
-        $builder
+            $builder
             ->add(
                 'deleteImage',
                 CheckboxType::class,
@@ -69,7 +69,8 @@ class UserType extends AbstractType
                 'choice_label' => 'nom',
                 'expanded' => false,
                 'multiple' => false,
-                'disabled' => !$options['isAdmin'],
+                'disabled'=> !$options['isAdmin'],
+                'placeholder' => 'Veuillez choisir un campus',
                 'query_builder' => function (CampusRepository $campusRepository) {
                     return $campusRepository->createQueryBuilder('c')
                         ->orderBy('c.nom', 'ASC');
