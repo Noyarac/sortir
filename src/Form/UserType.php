@@ -6,28 +6,58 @@ use App\Entity\Campus;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
 
 class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-       $builder
+        $builder
+            ->add(
+                'deleteImage',
+                CheckboxType::class,
+                [
+                    "label" => "Supprimer l'image de profil.",
+                    "mapped" => false,
+                    "required" => false,
+                ]
+            )
+            ->add(
+                'image',
+                FileType::class,
+                [
+                    "mapped" => false,
+                    "required" => false,
+                    "constraints" => [
+                        new Image([
+                            "maxSize" => "6000k",
+                            "mimeTypes" => [
+                                "image/jpeg",
+                                "image/png",
+                                "image/jpeg",
+                            ],
+                            "mimeTypesMessage" => "Veuillez utiliser un JPEG ou un PNG.",
+                        ])
+                    ]
+                ]
+            )
             ->add('campus', EntityType::class, [
                 'label' => 'Campus',
                 'class' => Campus::class,
                 'choice_label' => 'nom',
                 'expanded' => false,
                 'multiple' => false,
-                'disabled'=> !$options['campusModifiable'],
+                'disabled' => !$options['campusModifiable'],
             ])
             ->add('pseudo', TextType::class, [
                 'label' => 'Pseudo',
@@ -56,7 +86,7 @@ class UserType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-            ] )
+            ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'Les mots de passe doivent correspondre.',
@@ -82,11 +112,11 @@ class UserType extends AbstractType
         ;
     }
 
-   public function configureOptions(OptionsResolver $resolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'campusModifiable' => false,//valeur par défaut false : le campus n'est pas modifiable par un utilisateur
+            'campusModifiable' => false, //valeur par défaut false : le campus n'est pas modifiable par un utilisateur
         ]);
     }
 }
