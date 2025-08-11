@@ -59,9 +59,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $pseudo = null;
 
 
-    #[Assert\Regex([
-        'pattern'=>"/^(0[67])([ .]?\d{2}){4}$/",
-        'message'=>"Oops! le format du numéro ne semble pas valide. Le numéro de téléphone doit commencer par 06 ou 07. Les chiffres peuvent être séparés par un espace ou un point."])]
+    #[Assert\Regex(pattern:"/^(0[67])([ .]?\d{2}){4}$/",
+        message:"Oops! le format du numéro ne semble pas valide. Le numéro de téléphone doit commencer par 06 ou 07. Les chiffres peuvent être séparés par un espace ou un point.")]
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $telephone = null;
 

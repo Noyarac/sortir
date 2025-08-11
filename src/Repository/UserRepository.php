@@ -33,6 +33,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return User[]
+     */
+    public function getListeUtilisateurs() : array
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.campus', 'c')
+            ->addSelect('c')
+            ->orderBy('c.nom', 'ASC')
+            ->addOrderBy('u.actif', 'DESC')
+            ->addOrderBy('u.pseudo', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!$user instanceof User) {
