@@ -15,16 +15,6 @@
             {% include '_navbar.html.twig' %}
         </header>
         <main>
-            {% if app.user and app.request.attributes.get('route')!='app_login' %}
-            <div class="d-flex justify-content-end mt-2 px-2">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Bonjour {{ app.user.pseudo }}</h5>
-                        <p class="card-text mb-0">Date : {{ "now"|date("d/m/Y") }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
             {% for label,messages in app.flashes %}
                 {% for message in messages %}
                     <div class="alert alert-{{ label }} mt-2 px-2 flash-message">{{ message }}</div>
