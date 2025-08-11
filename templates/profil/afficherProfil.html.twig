@@ -10,7 +10,7 @@
 		<h3>{{ user.pseudo }}</h3>
 		<div class="row">
 			<div class="col col-md-3">
-				<img class="mt-4 img-thumbnail" style="max-width: 200px" src="{{ asset(profilePicturesDirectory ~ '/' ~ user.id) }}" onerror="this.src='{{ asset(profilePicturesDirectory ~ '/default.jpg')}}'">
+				<img class="mt-4 img-thumbnail" style="max-width: 200px" src="{{ asset(profilePicturesDirectory ~ '/' ~ user.id) }}?p={{date().timestamp}}" onerror="this.src='{{ asset(profilePicturesDirectory ~ '/default.jpg')}}'">
 			</div>
 			<div class="col col-md-9">
 				<dl>

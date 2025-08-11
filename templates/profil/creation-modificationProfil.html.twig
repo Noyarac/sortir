@@ -16,7 +16,7 @@
         {% if currentRoute == 'admin_creerUtilisateur' or currentRoute == 'admin_modifierProfilUtilisateurs' %}
         {{ form_row(userForm.actif) }}
         {% endif %}
-        <img class="mt-4 img-thumbnail" style="max-width: 200px" src="{{ asset(profilePicturesDirectory ~ '/' ~ user.id) }}" onerror="this.src='{{ asset(profilePicturesDirectory ~ '/default.jpg')}}'; document.querySelector('#user_deleteImage').parentElement.parentElement.style.display = 'none'">
+        <img class="mt-4 img-thumbnail" style="max-width: 200px" src="{{ asset(profilePicturesDirectory ~ '/' ~ user.id) }}?p={{ date().timestamp }}" onerror="this.src='{{ asset(profilePicturesDirectory ~ '/default.jpg')}}'; document.querySelector('#user_deleteImage').parentElement.parentElement.style.display = 'none'">
         {{ form_widget(userForm) }}
         <button type="submit" class="btn btn-primary">Enregistrer</button>
         {{ form_end(userForm) }}
