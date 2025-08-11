@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Etat;
 use App\Entity\Sortie;
+use App\Entity\User;
 use App\Form\SortieAnnulationType;
 use App\Form\SortieType;
 use App\Security\Voter\SortieVoter;
@@ -32,7 +33,7 @@ final class SortieController extends AbstractController
     {
         $sortie = new Sortie();
         //Inutile de vérifier que $user existe car application entièrement protégée et seulement accessible à ROLE_USER
-        /** @var \App\Entity\User $user */
+        /** @var User $user */
         $user = $this->getUser();
         $sortie->setOrganisateur($user);
         $sortie->setCampus($user->getCampus());
@@ -172,7 +173,7 @@ final class SortieController extends AbstractController
             $this->addFlash('danger', "Inscription impossible, jeton CSRF invalide");
             return $this->redirectToRoute('main_home');
         }
-
+        /** @var User $user */
         if ($sortieService->inscription($sortie, $user)) {
             $this->addFlash("success", "Vous vous êtes inscrit(e) avec succès.");
         } else {
@@ -194,8 +195,9 @@ final class SortieController extends AbstractController
             $this->addFlash('danger', "Désistement impossible, jeton CSRF invalide");
             return $this->redirectToRoute('main_home');
         }
-                if ($sortieService->desistement($sortie, $user)) {
-        $this->addFlash("success", "Vous vous êtes désisté(e) avec succès.");
+        /** @var User $user */
+        if ($sortieService->desistement($sortie, $user)) {
+            $this->addFlash("success", "Vous vous êtes désisté(e) avec succès.");
         } else {
             $this->addFlash("danger", "Une erreur est survenue, votre désinscription n'a pas été prise en compte.");
         }

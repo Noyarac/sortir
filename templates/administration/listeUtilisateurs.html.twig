@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{parent()}}| Liste utilisateurs{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h3 class="mb-3">Liste utilisateurs</h3>
+        {% if listeUtilisateurs is not empty %}
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Pseudo</th>
+                <th>Campus</th>
+                <th>Compte actif</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for utilisateur in listeUtilisateurs %}
+                <tr>
+                    <td><a href="{{ path('profil_afficher', {'id': utilisateur.id}) }}">{{ utilisateur.pseudo }}</a></td>
+                    <td>{{ utilisateur.campus}}</td>
+                    <td>{{ utilisateur.actif ? "✔" : "" }}</td>
+                    <td>
+                        <a href="{{ path('administration_modifierProfilUtilisateurs', {'id' : utilisateur.id}) }}" class="btn btn-outline-secondary mb-1 w-100">Modifier</a>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            <tbody>
+        {% endif %}
+    </div>
+{% endblock %}

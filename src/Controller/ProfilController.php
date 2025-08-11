@@ -19,7 +19,7 @@ final class ProfilController extends AbstractController
         $user = $this->getUser();
         //Inutile de vérifier que $user existe car application entièrement protégée et seulement accessible à ROLE_USER
         $userForm = $this->createForm(UserType::class, $user, [
-            'campusModifiable' => false, //un utilisateur ne peut pas modifier son campus de référence
+            'isAdmin' => false, //un utilisateur ne peut pas modifier son campus de référence, ni activer/désactiver son compte
         ]);
 
         $userForm->handleRequest($request);
