@@ -3,8 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Ville;
+use App\Form\DTO\FiltreVille;
+use App\Form\FiltreVilleType;
 use App\Form\UserType;
+use App\Form\VilleType;
 use App\Repository\UserRepository;
+use App\Repository\VilleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
@@ -33,9 +38,49 @@ final class AdministrationController extends AbstractController
     }
 
     #[Route('/villes', name: 'admin_villes', methods: ['GET', 'POST'])]
-    public function gestionVilles(): Response
+    public function gestionVilles(Request $request, EntityManagerInterface $entityManager): Response
     {
-        return $this->render('admin/gestionVilles.html.twig', []);
+        //Création du formulaire de filtre
+        $filtreVille = new filtreVille();
+        /** @var VilleRepository $villeRepository */
+        $filtreVilleForm = $this->createForm(FiltreVilleType::class, $filtreVille);
+
+        //Création du formulaire pour créer une nouvelle ville
+        $ville= new Ville();
+        $villeForm = $this->createForm(VilleType::class, $ville);
+
+        //On remonte de la BDD toutes les villes
+        $villeRepository = $entityManager->getRepository(Ville::class);
+        $villes = $villeRepository->findBy([], ['nom' => 'ASC']);
+
+        //Gestion du formulaire de filtre
+        $filtreVilleForm->handleRequest($request);
+
+        if ($filtreVilleForm->isSubmitted() && $filtreVilleForm->isValid()) {
+            $nomContient = $filtreVilleForm->get('nomContient')->getData();
+            $villes = $villeRepository->findVillesByFilters($nomContient);
+            return $this->render('admin/gestionVilles.html.twig', [
+                "filtreVilleForm" => $filtreVilleForm,
+                "villes" => $villes,
+                "villeForm" => $villeForm,
+            ]);
+        }
+
+        //Gestion du formulaire de création d'une ville
+        $villeForm->handleRequest($request);
+
+        if ($villeForm->isSubmitted() && $villeForm->isValid()) {
+            $entityManager->persist($ville);
+            $entityManager->flush();
+            $this->addFlash('success','Ville créée avec succès!');
+            return $this->redirectToRoute('admin_villes');
+        }
+
+        return $this->render('admin/gestionVilles.html.twig', [
+            "filtreVilleForm" => $filtreVilleForm,
+            "villes" => $villes,
+            "villeForm" => $villeForm,
+        ]);
     }
 
     #[Route('/utilisateurs/liste', name: 'admin_listeUtilisateurs', methods: ['GET', 'POST'])]

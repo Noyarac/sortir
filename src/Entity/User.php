@@ -108,7 +108,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setEmail(string $email): static
     {
-        $this->email = $email;
+        $emailFormate = strtolower($email);
+        $this->email = $emailFormate;
 
         return $this;
     }
@@ -182,7 +183,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setNom(string $nom): static
     {
-        $this->nom = $nom;
+        $nom = mb_strtolower(trim($nom), 'UTF-8');
+        $nomFormate = mb_strtoupper(mb_substr($nom, 0, 1, 'UTF-8'), 'UTF-8') .
+            mb_substr($nom, 1, null, 'UTF-8');
+        $this->nom = $nomFormate;
 
         return $this;
     }
@@ -194,7 +198,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPrenom(string $prenom): static
     {
-        $this->prenom = $prenom;
+        $prenom = mb_strtolower(trim($prenom), 'UTF-8');
+        $prenomFormate = mb_strtoupper(mb_substr($prenom, 0, 1, 'UTF-8'), 'UTF-8') .
+            mb_substr($prenom, 1, null, 'UTF-8');
+        $this->prenom = $prenomFormate;
 
         return $this;
     }

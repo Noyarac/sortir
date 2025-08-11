@@ -16,6 +16,16 @@ class VilleRepository extends ServiceEntityRepository
         parent::__construct($registry, Ville::class);
     }
 
+    public function findVillesByFilters(string $contient) : array
+    {
+        return $this->createQueryBuilder('v')
+            ->where('v.nom LIKE :contient')
+            ->setParameter('contient', '%'.$contient.'%')
+            ->orderBy('v.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Ville[] Returns an array of Ville objects
     //     */

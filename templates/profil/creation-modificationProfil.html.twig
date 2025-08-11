@@ -1,10 +1,17 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}{{ parent() }} | Mon profil{% endblock %}
+{% set currentRoute = app.request.attributes.get('_route') %}
+{% block title %}{{ parent() }} |
+    {% if currentRoute == 'profil_modifier' %}
+        Mon Profil
+    {% elseif currentRoute == 'admin_creerUtilisateur' %}
+        Créer utilisateur
+    {% else %}
+        Modifier Profil
+    {% endif %}
+{% endblock %}
 
 {% block body %}
     <div class="container">
-        {% set currentRoute = app.request.attributes.get('_route') %}
         {% if currentRoute == 'profil_modifier' %}
             <h3>Mon Profil</h3>
         {% elseif currentRoute == 'admin_creerUtilisateur' %}
