@@ -7,10 +7,15 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
+
 #[Route('/admin')]
 final class AdministrationController extends AbstractController
 {
@@ -45,7 +50,7 @@ final class AdministrationController extends AbstractController
     }
 
     #[Route('/utilisateurs/{id}/modifier', name: 'admin_modifierProfilUtilisateurs', requirements: ['id'=>'\d+'], methods: ['GET', 'POST'])]
-    public function modifierProfilUtilisateur(User $user, EntityManagerInterface $entityManager, Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    public function modifierProfilUtilisateur(User $user, EntityManagerInterface $entityManager, Request $request, UserPasswordHasherInterface $passwordHasher, SluggerInterface $slugger): Response
     {
         $userForm = $this->createForm(UserType::class, $user, [
             'isAdmin' => true, //un admin peut modifier le campus et activer/inactiver un compte mais ne peut pas modifier le mot de passe d'un utilisateur
@@ -54,18 +59,42 @@ final class AdministrationController extends AbstractController
         $userForm->handleRequest($request);
 
         if($userForm->isSubmitted() && $userForm->isValid()){
+            /** @var UploadedFile $image */
+            $imageFile = $userForm->get('image')->getData();
+            if ($imageFile) {
+                try {
+                    $imageFile->move(
+                        $this->getParameter('app.backendProfilePicturesDirectory'),
+                        $slugger->slug($user->getId()));
+                } catch (FileException $e) {
+                    $this->addFlash('danger', "Un problème est survenu lors de l'enregistrement de votre image de profil.");
+                }
+            }
+            if ($userForm->get("deleteImage")->getViewData()) {
+                $fileSystem = new Filesystem();
+                $filePath = $this->getParameter('app.backendProfilePicturesDirectory') . '/' . $user->getId();
+                if ($fileSystem->exists($filePath)) {
+                    try {
+                        $fileSystem->remove($filePath);
+                    } catch (IOExceptionInterface $exception) {
+                        $this->addFlash("danger", "Impossible de supprimer votre image de profile.");
+                    }
+                } else {
+                    $this->addFlash("info", "Votre image de profile n'a pas été supprimée, car elle n'existe pas.");
+                }
+            }
             $entityManager->flush();
             $this->addFlash('success', 'Profil mis à jour avec succès!');
             return $this->redirectToRoute('admin_listeUtilisateurs');
         }
-
         return $this->render('profil/creation-modificationProfil.html.twig', [
             'userForm' => $userForm,
+            'user' => $user,
         ]);
     }
 
     #[Route('/utilisateurs/creer', name: 'admin_creerUtilisateur', methods: ['GET', 'POST'])]
-    public function creerUtilisateur(Request $request, EntityManagerInterface $entityManager,UserPasswordHasherInterface $passwordHasher): Response
+    public function creerUtilisateur(Request $request, EntityManagerInterface $entityManager,UserPasswordHasherInterface $passwordHasher, SluggerInterface $slugger): Response
     {
         $user = new User();
         $userForm = $this->createForm(UserType::class, $user, [
@@ -79,6 +108,31 @@ final class AdministrationController extends AbstractController
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
 
+            /** @var UploadedFile $image */
+            $imageFile = $userForm->get('image')->getData();
+            if ($imageFile) {
+                try {
+                    $imageFile->move(
+                        $this->getParameter('app.backendProfilePicturesDirectory'),
+                        $slugger->slug($user->getId()));
+                } catch (FileException $e) {
+                    $this->addFlash('danger', "Un problème est survenu lors de l'enregistrement de votre image de profil.");
+                }
+            }
+            if ($userForm->get("deleteImage")->getViewData()) {
+                $fileSystem = new Filesystem;
+                $filePath = $this->getParameter('app.backendProfilePicturesDirectory') . '/' . $user->getId();
+                if ($fileSystem->exists($filePath)) {
+                    try {
+                        $fileSystem->remove($filePath);
+                    } catch (IOExceptionInterface $exception) {
+                        $this->addFlash("danger", "Impossible de supprimer votre image de profile.");
+                    }
+                } else {
+                    $this->addFlash("info", "Votre image de profile n'a pas été supprimée, car elle n'existe pas.");
+                }
+            }
+
             $entityManager->persist($user);
             $entityManager->flush();
             $this->addFlash('success', 'Nouvel utilisateur créé avec succès!');
@@ -87,6 +141,7 @@ final class AdministrationController extends AbstractController
 
         return $this->render('profil/creation-modificationProfil.html.twig', [
             'userForm' => $userForm,
+            "user" => $user,
         ]);
     }
 
