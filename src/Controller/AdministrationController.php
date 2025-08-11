@@ -97,17 +97,6 @@ final class AdministrationController extends AbstractController
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
 
-            /** @var UploadedFile $image */
-            $imageFile = $userForm->get('image')->getData();
-            if ($imageFile) {
-                try {
-                    $imageFile->move(
-                        $this->getParameter('app.backendProfilePicturesDirectory'),
-                        $slugger->slug($user->getId()));
-                } catch (FileException $e) {
-                    $this->addFlash('danger', "Un problème est survenu lors de l'enregistrement de votre image de profil.");
-                }
-            }
             if ($userForm->get("deleteImage")->getViewData()) {
                 $fileSystem = new Filesystem;
                 $filePath = $this->getParameter('app.backendProfilePicturesDirectory') . '/' . $user->getId();
