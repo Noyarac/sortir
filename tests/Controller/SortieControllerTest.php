@@ -2,7 +2,9 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\Etat;
 use App\Entity\Lieu;
+use App\Entity\Sortie;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -38,4 +40,18 @@ class SortieControllerTest extends WebTestCase
         $this->client->followRedirect();
         $this->assertRouteSame('main_home');
     }
+
+    public function test_affichage_details(): void
+    {
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
+        //simuler la connexion d'un utilisateur
+        $user = $entityManager->getRepository(User::class)->findOneBy([]);
+        $sortie = $entityManager->getRepository(Sortie::class)->findOneBy(["etat" => Etat::OUVERTE->value]);
+        $this->client->loginUser($user);
+        $this->client->request('GET', '/sortie/' . $sortie->getId());
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h3', 'Afficher une sortie');
+        $this->assertSelectorTextContains('dd', $sortie->getNom());
+    }
+
 }
