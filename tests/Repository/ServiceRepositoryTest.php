@@ -38,9 +38,9 @@ class ServiceRepositoryTest extends KernelTestCase
     {
         $entityManager = self::$entityManager;
         $sortieRepository = self::$sortieRepository;
-        $campus = self::$campusRepository->find(1);
-        $lieu = self::$lieuRepository->find(1);
-        $user = self::$userRepository->find(1);
+        $campus = self::$campusRepository->findOneBy([]);
+        $lieu = self::$lieuRepository->findOneBy([]);
+        $user = self::$userRepository->findOneBy([]);
 
         $sortieHistorisable = new Sortie();
         $sortieHistorisable->setNom('Sortie Historisable');

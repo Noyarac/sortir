@@ -6,12 +6,22 @@
 {% endblock %}
 
 {% block body %}
+    {% if app.user %}
+        <div class="d-flex justify-content-end mt-2 px-2">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Bonjour {{ app.user.pseudo }}</h5>
+                    <p class="card-text mb-0">Date : {{ "now"|date("d/m/Y") }}</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 	<section>
 		{{ form_start(filtreForm, {'attr': {'data-turbo': 'false'}})}}
 		<div class="container">
 			<div class="row">
 				<h5>Filtrer les sorties</h5>
-				<div class="col-5">
+				<div class="col-5" id="filtres">
 					{{ form_row(filtreForm.campus) }}
 					{{ form_row(filtreForm.contient) }}
 					<div class="row">

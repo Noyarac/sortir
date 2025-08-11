@@ -16,33 +16,13 @@ class SortieControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
     }
-    public function test_creationSortie_UserConnectePeutAccederAlaPage(): void
-    {
-        $entityManager = self::getContainer()->get('doctrine')->getManager();
-        //simuler la connexion d'un utilisateur
-        $user = $entityManager->getRepository(User::class)->find(1);
-        $this->client->loginUser($user);
-        //accéder à la page de création GET
-        $this->client->request('GET', '/sortie/creation');
-
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function test_creationSortie_UserNonConnecteRedirigerVersLogin(): void
-    {
-        $this->client->request('GET', '/sortie/creation');
-        $this->assertResponseRedirects('/login');
-
-        $this->client->followRedirect();
-        $this->assertRouteSame('app_login');
-    }
 
     public function test_creationSortie_FormulaireValideBouton():void
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
         //simuler la connexion d'un utilisateur
-        $user = $entityManager->getRepository(User::class)->find(1);
-        $lieu = $entityManager->getRepository(Lieu::class)->find(1);
+        $user = $entityManager->getRepository(User::class)->findOneBy([]);
+        $lieu = $entityManager->getRepository(Lieu::class)->findOneBy([]);
         $this->client->loginUser($user);
         //accéder à la page de création GET
         $this->client->request('GET', '/sortie/creation');

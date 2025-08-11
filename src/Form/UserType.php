@@ -60,19 +60,16 @@ class UserType extends AbstractType
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'Les mots de passe doivent correspondre.',
-                'label' => 'Mot de passe',
                 'mapped' => false,
+                'required' => false,
                 'first_options'  => [
-                    'label' => 'Mot de passe',
+                    'label' => 'Nouveau mot de passe',
                     'attr' => ['autocomplete' => 'new-password'],
                 ],
                 'second_options' => [
                     'label' => 'Confirmation mot de passe',
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez choisir un mot de passe',
-                    ]),
                     new Length([
                         'max' => 4096,
                     ]),
