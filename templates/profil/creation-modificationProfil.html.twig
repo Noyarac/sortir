@@ -20,6 +20,10 @@
             <h3>Modifier Profil</h3>
         {% endif %}
         {{ form_start(userForm) }}
+        {% if currentRoute == 'admin_creerUtilisateur' %}
+        {{ form_row(userForm.actif) }}
+        {% endif %}
+        <img class="mt-4 img-thumbnail" style="max-width: 200px" src="{{ asset(profilePicturesDirectory ~ '/' ~ user.id) }}" onerror="this.src='{{ asset(profilePicturesDirectory ~ '/default.jpg')}}'">
         {{ form_widget(userForm) }}
         <button type="submit" class="btn btn-primary">Enregistrer</button>
         {{ form_end(userForm) }}

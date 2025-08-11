@@ -1,33 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ parent() }} | Profil{% endblock %}
+{% block title %}
+	{{ parent() }}
+	| Profil
+{% endblock %}
 
 {% block body %}
-    <div class="container">
-        <h3 class="ms-4">{{ user.pseudo }}</h3>
-        <dl class="dlStyle">
-            <div>
-                <div>
-                    <dt>Campus</dt>
-                    <dd>{{ user.campus.nom }}</dd>
-                </div>
-                <div>
-                    <dt>Prénom</dt>
-                    <dd>{{user.prenom}}</dd>
-                </div>
-                <div>
-                    <dt>Nom</dt>
-                    <dd>{{user.nom}}</dd>
-                </div>
-                <div>
-                    <dt>Téléphone</dt>
-                    <dd>{{user.telephone ? (user.telephone | split('') | batch(2) | map(nombres => nombres|join) | join(' ')) : 'Non Renseigné' }}</dd>
-                </div>
-                <div>
-                    <dt>Email</dt>
-                    <dd>{{user.email}}</dd>
-                </div>
-            </div>
-        </dl>
-    </div>
+	<div class="container" style="max-width: 100ch">
+		<h3>{{ user.pseudo }}</h3>
+		<div class="row">
+			<div class="col col-md-3">
+				<img class="mt-4 img-thumbnail" style="max-width: 200px" src="{{ asset(profilePicturesDirectory ~ '/' ~ user.id) }}" onerror="this.src='{{ asset(profilePicturesDirectory ~ '/default.jpg')}}'">
+			</div>
+			<div class="col col-md-9">
+				<dl>
+					<div class="row">
+                        <div class="col col-md-6">
+                            <div class="m-4">
+                                <dt class="text-secondary">Campus</dt>
+                                <dd>{{ user.campus.nom }}</dd>
+                            </div>
+                            <div class="m-4">
+                                <dt class="text-secondary">Prénom</dt>
+                                <dd>{{user.prenom}}</dd>
+                            </div>
+                            <div class="m-4">
+                                <dt class="text-secondary">Nom</dt>
+                                <dd>{{user.nom}}</dd>
+                            </div>
+                        </div>
+                        <div class="col col-md-6">
+                            <div class="m-4">
+                                <dt class="text-secondary">Téléphone</dt>
+                                <dd>{{user.telephone ? (user.telephone | split('') | batch(2) | map(nombres => nombres|join) | join(' ')) : 'Non Renseigné' }}</dd>
+                            </div>
+                            <div class="m-4">
+                                <dt class="text-secondary">Email</dt>
+                                <dd>{{user.email}}</dd>
+                            </div>
+                        </div>
+                    </div>
+				</dl>
+			</div>
+		</div>
+	</div>
 {% endblock %}
