@@ -21,6 +21,7 @@
     <hr>
     <section>
         <div class="container">
+            {{ form_start(villeForm, {'attr': {'data-turbo': 'false'}}) }}
             <table class="table">
                 <thead>
                 <tr>
@@ -30,29 +31,35 @@
                 </tr>
                 </thead>
                 <tbody>
-                    {% for ville in villes %}
-                        <tr>
-                            <td>{{ ville.nom | capitalize }}</td>
-                            <td>{{ ville.codePostal }}</td>
-                            <td>
-                            </td>
-                        </tr>
-                        {% if loop.last %}
-                            {{ form_start(villeForm) }}
-                            <td>
-                                {{ form_row(villeForm.nom) }}
-                            </td>
-                            <td>
-                                {{ form_row(villeForm.codePostal) }}
-                            </td>
-                            <td>
-                                <button type="submit" class="btn btn-primary">Ajouter</button>
-                            </td>
-                            {{ form_end(villeForm) }}
-                        {% endif %}
-                    {% endfor %}
+                    <tr>
+
+                        <td>
+                            {{ form_row(villeForm.nom, {'label':false}) }}
+                        </td>
+                        <td>
+                            {{ form_row(villeForm.codePostal,{'label':false}) }}
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                        </td>
+
+                    </tr>
+                    {% if villes is not empty %}
+                        {% for ville in villes %}
+                            <tr>
+                                <td class="col-6">{{ ville.nom | capitalize }}</td>
+                                <td class="col-3">{{ ville.codePostal }}</td>
+                                <td class="col-auto">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
+            {{ form_end(villeForm) }}
+            {% if villes is empty %}
+                <p>Aucune ville ne correspond au critère de recherche.</p>
+            {% endif %}
     </section>
 {% endblock %}
 

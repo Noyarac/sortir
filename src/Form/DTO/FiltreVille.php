@@ -14,5 +14,12 @@ class FiltreVille
         return $this->nomContient;
     }
 
+    public function setNomContient(?string $nomContient): void
+    {
+        $this->nomContient = $nomContient;
+    }
+
+
+
 
 }
