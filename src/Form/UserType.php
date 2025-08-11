@@ -37,6 +37,7 @@ class UserType extends AbstractType
                 'expanded' => false,
                 'multiple' => false,
                 'disabled'=> !$options['isAdmin'],
+                'placeholder' => 'Veuillez choisir un campus',
                 'query_builder' => function (CampusRepository $campusRepository) {
                     return $campusRepository->createQueryBuilder('c')
                         ->orderBy('c.nom', 'ASC');

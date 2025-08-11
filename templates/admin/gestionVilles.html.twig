@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{parent()}}| Villes{% endblock %}
+
+{% block body %}
+    <section>
+        <div class="container">
+            <div class="row">
+                <h5>Filtrer les villes</h5>
+                {{ form_start(filtreVilleForm, {'attr': {'data-turbo': 'false'}})}}
+                <div class="col-8">
+                    {{ form_widget(filtreVilleForm) }}
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </div>
+                {{ form_end(filtreVilleForm) }}
+            </div>
+        </div>
+    </section>
+    <hr>
+    <section>
+        <div class="container">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Ville</th>
+                    <th>Code postal</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for ville in villes %}
+                        <tr>
+                            <td>{{ ville.nom | capitalize }}</td>
+                            <td>{{ ville.codePostal }}</td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </section>
+{% endblock %}
+

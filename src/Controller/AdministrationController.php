@@ -3,8 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Ville;
+use App\Form\DTO\FiltreVille;
+use App\Form\FiltreVilleType;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Repository\VilleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,9 +32,29 @@ final class AdministrationController extends AbstractController
     }
 
     #[Route('/villes', name: 'admin_villes', methods: ['GET', 'POST'])]
-    public function gestionVilles(): Response
+    public function gestionVilles(Request $request, EntityManagerInterface $entityManager): Response
     {
-        return $this->render('admin/gestionVilles.html.twig', []);
+        $filtreVille = new filtreVille();
+        /** @var VilleRepository $villeRepository */
+        $filtreVilleForm = $this->createForm(FiltreVilleType::class, $filtreVille);
+
+        $villeRepository = $entityManager->getRepository(Ville::class);
+        $villes = $villeRepository->findBy([], ['nom' => 'ASC']);
+
+        $filtreVilleForm->handleRequest($request);
+        if ($filtreVilleForm->isSubmitted() && $filtreVilleForm->isValid()) {
+            $nomContient = $filtreVilleForm->get('nomContient')->getData();
+            $villes = $villeRepository->findVillesByFilters($nomContient);
+            return $this->render('admin/gestionVilles.html.twig', [
+                "filtreVilleForm" => $filtreVilleForm,
+                "villes" => $villes,
+            ]);
+        }
+
+        return $this->render('admin/gestionVilles.html.twig', [
+            "filtreVilleForm" => $filtreVilleForm,
+            "villes" => $villes,
+        ]);
     }
 
     #[Route('/utilisateurs/liste', name: 'admin_listeUtilisateurs', methods: ['GET', 'POST'])]
