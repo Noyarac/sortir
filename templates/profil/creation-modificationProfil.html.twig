@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} | Mon profil{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {% set currentRoute = app.request.attributes.get('_route') %}
+        {% if currentRoute == 'profil_modifier' %}
+            <h3>Mon Profil</h3>
+        {% elseif currentRoute == 'admin_creerUtilisateur' %}
+            <h3>Création d'un nouvel utilisateur</h3>
+        {% else %}
+            <h3>Modifier Profil</h3>
+        {% endif %}
+        {{ form_start(userForm) }}
+        {{ form_widget(userForm) }}
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        {{ form_end(userForm) }}
+    </div>
+{% endblock %}

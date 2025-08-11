@@ -27,6 +27,7 @@ final class ProfilController extends AbstractController
         if ($userForm->isSubmitted() && $userForm->isValid()) {
             $plainPassword = $userForm->get('plainPassword')->getData();
             if($plainPassword){
+                /** @var User $user */
                 $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
                 $user->setPassword($hashedPassword);
             }
@@ -35,7 +36,7 @@ final class ProfilController extends AbstractController
             return $this->redirectToRoute('main_home');
         }
 
-        return $this->render('profil/modifierProfil.html.twig', [
+        return $this->render('profil/creation-modificationProfil.html.twig', [
             'userForm' => $userForm,
         ]);
     }

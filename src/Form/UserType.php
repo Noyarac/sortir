@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Campus;
 use App\Entity\User;
+use App\Repository\CampusRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -36,6 +37,10 @@ class UserType extends AbstractType
                 'expanded' => false,
                 'multiple' => false,
                 'disabled'=> !$options['isAdmin'],
+                'query_builder' => function (CampusRepository $campusRepository) {
+                    return $campusRepository->createQueryBuilder('c')
+                        ->orderBy('c.nom', 'ASC');
+                }
             ])
             ->add('pseudo', TextType::class, [
                 'label' => 'Pseudo',
@@ -64,27 +69,30 @@ class UserType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-            ] )
-            ->add('plainPassword', RepeatedType::class, [
-                'type' => PasswordType::class,
-                'invalid_message' => 'Les mots de passe doivent correspondre.',
-                'mapped' => false,
-                'required' => false,
-                'first_options'  => [
-                    'label' => 'Nouveau mot de passe',
-                    'attr' => ['autocomplete' => 'new-password'],
-                ],
-                'second_options' => [
-                    'label' => 'Confirmation mot de passe',
-                ],
-                'constraints' => [
-                    new Length(max:4096),
-                    new Regex(pattern:'/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={}\[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
-                        message:"Le mot de passe doit comporter au minimum 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial : !@#$%^&*()_-+={}[]|:;/\"'<>,.?~",
-                    )
-                ]
-            ])
-        ;
+            ] );
+        if(!$options['isAdmin'] || $options['creation']){
+            $builder
+                ->add('plainPassword', RepeatedType::class, [
+                    'type' => PasswordType::class,
+                    'invalid_message' => 'Les mots de passe doivent correspondre.',
+                    'mapped' => false,
+                    'required' => $options['creation'],
+                    'first_options'  => [
+                        'label' => 'Nouveau mot de passe',
+                        'attr' => ['autocomplete' => 'new-password'],
+                    ],
+                    'second_options' => [
+                        'label' => 'Confirmation mot de passe',
+                    ],
+                    'constraints' => [
+                        new Length(max:4096),
+                        new Regex(pattern:'/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={}\[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
+                            message:"Le mot de passe doit comporter au minimum 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial : !@#$%^&*()_-+={}[]|:;/\"'<>,.?~",
+                        )
+                    ]
+                ]);
+        }
+
     }
 
    public function configureOptions(OptionsResolver $resolver): void
@@ -92,6 +100,7 @@ class UserType extends AbstractType
         $resolver->setDefaults([
             'data_class' => User::class,
             'isAdmin' => false,//valeur par défaut false : par défaut on considère un utilisateur comme non admin
+            'creation' => false,
         ]);
     }
 }

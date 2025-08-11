@@ -4,7 +4,10 @@
 
 {% block body %}
     <div class="container">
-        <h3 class="mb-3">Liste utilisateurs</h3>
+        <div class="mb-3 d-flex align-items-center justify-content-between">
+            <h3>Liste utilisateurs</h3>
+            <a href="{{ path('admin_creerUtilisateur') }}" class="btn btn-secondary">Ajouter un nouvel utilisateur</a>
+        </div>
         {% if listeUtilisateurs is not empty %}
         <table class="table">
             <thead>
@@ -22,8 +25,7 @@
                     <td>{{ utilisateur.campus}}</td>
                     <td>{{ utilisateur.actif ? "✔" : "" }}</td>
                     <td>
-                        <a href="{{ path('administration_modifierProfilUtilisateurs', {'id' : utilisateur.id}) }}" class="btn btn-outline-secondary mb-1 w-100">Modifier</a>
-
+                        <a href="{{ path('admin_modifierProfilUtilisateurs', {'id' : utilisateur.id}) }}" class="btn btn-outline-secondary mb-1 w-100">Modifier</a>
                     </td>
                 </tr>
             {% endfor %}
