@@ -59,17 +59,6 @@ final class AdministrationController extends AbstractController
         $userForm->handleRequest($request);
 
         if($userForm->isSubmitted() && $userForm->isValid()){
-            /** @var UploadedFile $image */
-            $imageFile = $userForm->get('image')->getData();
-            if ($imageFile) {
-                try {
-                    $imageFile->move(
-                        $this->getParameter('app.backendProfilePicturesDirectory'),
-                        $slugger->slug($user->getId()));
-                } catch (FileException $e) {
-                    $this->addFlash('danger', "Un problème est survenu lors de l'enregistrement de votre image de profil.");
-                }
-            }
             if ($userForm->get("deleteImage")->getViewData()) {
                 $fileSystem = new Filesystem();
                 $filePath = $this->getParameter('app.backendProfilePicturesDirectory') . '/' . $user->getId();
@@ -77,10 +66,10 @@ final class AdministrationController extends AbstractController
                     try {
                         $fileSystem->remove($filePath);
                     } catch (IOExceptionInterface $exception) {
-                        $this->addFlash("danger", "Impossible de supprimer votre image de profile.");
+                        $this->addFlash("danger", "Impossible de supprimer l'image de profile.");
                     }
                 } else {
-                    $this->addFlash("info", "Votre image de profile n'a pas été supprimée, car elle n'existe pas.");
+                    $this->addFlash("info", "L'image de profile n'a pas été supprimée, car elle n'existe pas.");
                 }
             }
             $entityManager->flush();
@@ -108,17 +97,6 @@ final class AdministrationController extends AbstractController
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
 
-            /** @var UploadedFile $image */
-            $imageFile = $userForm->get('image')->getData();
-            if ($imageFile) {
-                try {
-                    $imageFile->move(
-                        $this->getParameter('app.backendProfilePicturesDirectory'),
-                        $slugger->slug($user->getId()));
-                } catch (FileException $e) {
-                    $this->addFlash('danger', "Un problème est survenu lors de l'enregistrement de votre image de profil.");
-                }
-            }
             if ($userForm->get("deleteImage")->getViewData()) {
                 $fileSystem = new Filesystem;
                 $filePath = $this->getParameter('app.backendProfilePicturesDirectory') . '/' . $user->getId();
