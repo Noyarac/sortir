@@ -39,26 +39,30 @@ class UserType extends AbstractType
                     "mapped" => false,
                     "required" => false,
                 ]
-            )
-            ->add(
-                'image',
-                FileType::class,
-                [
-                    "mapped" => false,
-                    "required" => false,
-                    "constraints" => [
-                        new Image([
-                            "maxSize" => "6000k",
-                            "mimeTypes" => [
-                                "image/jpeg",
-                                "image/png",
-                                "image/jpeg",
-                            ],
-                            "mimeTypesMessage" => "Veuillez utiliser un JPEG ou un PNG.",
-                        ])
+            );
+        if (!$options['isAdmin']) {
+            $builder
+                ->add(
+                    'image',
+                    FileType::class,
+                    [
+                        "mapped" => false,
+                        "required" => false,
+                        "constraints" => [
+                            new Image([
+                                "maxSize" => "6000k",
+                                "mimeTypes" => [
+                                    "image/jpeg",
+                                    "image/png",
+                                    "image/jpeg",
+                                ],
+                                "mimeTypesMessage" => "Veuillez utiliser un JPEG ou un PNG.",
+                            ])
+                        ]
                     ]
-                ]
-            )
+                );
+        }
+        $builder
             ->add('campus', EntityType::class, [
                 'label' => 'Campus',
                 'class' => Campus::class,
@@ -99,8 +103,8 @@ class UserType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-            ] );
-        if(!$options['isAdmin'] || $options['creation']){
+            ]);
+        if (!$options['isAdmin'] || $options['creation']) {
             $builder
                 ->add('plainPassword', RepeatedType::class, [
                     'type' => PasswordType::class,
@@ -115,21 +119,21 @@ class UserType extends AbstractType
                         'label' => 'Confirmation mot de passe',
                     ],
                     'constraints' => [
-                        new Length(max:4096),
-                        new Regex(pattern:'/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={}\[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
-                            message:"Le mot de passe doit comporter au minimum 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial : !@#$%^&*()_-+={}[]|:;/\"'<>,.?~",
+                        new Length(max: 4096),
+                        new Regex(
+                            pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={}\[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
+                            message: "Le mot de passe doit comporter au minimum 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial : !@#$%^&*()_-+={}[]|:;/\"'<>,.?~",
                         )
                     ]
                 ]);
         }
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'isAdmin' => false,//valeur par défaut false : par défaut on considère un utilisateur comme non admin
+            'isAdmin' => false, //valeur par défaut false : par défaut on considère un utilisateur comme non admin
             'creation' => false,
         ]);
     }
