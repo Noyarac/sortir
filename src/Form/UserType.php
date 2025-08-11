@@ -24,7 +24,6 @@ class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $fileSystem = new Filesystem();
         if ($options['isAdmin']) {
             $builder
                 ->add('actif', CheckboxType::class, [
