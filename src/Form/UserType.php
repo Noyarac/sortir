@@ -4,8 +4,10 @@ namespace App\Form;
 
 use App\Entity\Campus;
 use App\Entity\User;
+use App\Repository\CampusRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -20,14 +22,25 @@ class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-       $builder
+        if($options['isAdmin']){
+            $builder
+                ->add('actif', CheckboxType::class, [
+                    'label' => 'Compte actif',
+                    'required' => false,
+                ]);
+        }
+           $builder
             ->add('campus', EntityType::class, [
                 'label' => 'Campus',
                 'class' => Campus::class,
                 'choice_label' => 'nom',
                 'expanded' => false,
                 'multiple' => false,
-                'disabled'=> !$options['campusModifiable'],
+                'disabled'=> !$options['isAdmin'],
+                'query_builder' => function (CampusRepository $campusRepository) {
+                    return $campusRepository->createQueryBuilder('c')
+                        ->orderBy('c.nom', 'ASC');
+                }
             ])
             ->add('pseudo', TextType::class, [
                 'label' => 'Pseudo',
@@ -56,37 +69,38 @@ class UserType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-            ] )
-            ->add('plainPassword', RepeatedType::class, [
-                'type' => PasswordType::class,
-                'invalid_message' => 'Les mots de passe doivent correspondre.',
-                'mapped' => false,
-                'required' => false,
-                'first_options'  => [
-                    'label' => 'Nouveau mot de passe',
-                    'attr' => ['autocomplete' => 'new-password'],
-                ],
-                'second_options' => [
-                    'label' => 'Confirmation mot de passe',
-                ],
-                'constraints' => [
-                    new Length([
-                        'max' => 4096,
-                    ]),
-                    new Regex([
-                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={}\[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
-                        'message' => "Le mot de passe doit comporter au minimum 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial : !@#$%^&*()_-+={}[]|:;/\"'<>,.?~"
-                    ])
-                ]
-            ])
-        ;
+            ] );
+        if(!$options['isAdmin'] || $options['creation']){
+            $builder
+                ->add('plainPassword', RepeatedType::class, [
+                    'type' => PasswordType::class,
+                    'invalid_message' => 'Les mots de passe doivent correspondre.',
+                    'mapped' => false,
+                    'required' => $options['creation'],
+                    'first_options'  => [
+                        'label' => 'Nouveau mot de passe',
+                        'attr' => ['autocomplete' => 'new-password'],
+                    ],
+                    'second_options' => [
+                        'label' => 'Confirmation mot de passe',
+                    ],
+                    'constraints' => [
+                        new Length(max:4096),
+                        new Regex(pattern:'/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={}\[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
+                            message:"Le mot de passe doit comporter au minimum 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial : !@#$%^&*()_-+={}[]|:;/\"'<>,.?~",
+                        )
+                    ]
+                ]);
+        }
+
     }
 
    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'campusModifiable' => false,//valeur par défaut false : le campus n'est pas modifiable par un utilisateur
+            'isAdmin' => false,//valeur par défaut false : par défaut on considère un utilisateur comme non admin
+            'creation' => false,
         ]);
     }
 }
