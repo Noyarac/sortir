@@ -4,14 +4,14 @@
 
 {% block body %}
     <section>
+        {{ form_start(filtreVilleForm, {'attr': {'data-turbo': 'false'}})}}
         <div class="container">
-            <div class="row">
+            <div class="row align-items-end">
                 <h5>Filtrer les villes</h5>
-                {{ form_start(filtreVilleForm, {'attr': {'data-turbo': 'false'}})}}
-                <div class="col-8">
+                <div class="col-6">
                     {{ form_widget(filtreVilleForm) }}
                 </div>
-                <div class="col-2">
+                <div class="col-auto mb-3">
                     <button type="submit" class="btn btn-primary">Rechercher</button>
                 </div>
                 {{ form_end(filtreVilleForm) }}
@@ -34,8 +34,22 @@
                         <tr>
                             <td>{{ ville.nom | capitalize }}</td>
                             <td>{{ ville.codePostal }}</td>
-                            <td></td>
+                            <td>
+                            </td>
                         </tr>
+                        {% if loop.last %}
+                            {{ form_start(villeForm) }}
+                            <td>
+                                {{ form_row(villeForm.nom) }}
+                            </td>
+                            <td>
+                                {{ form_row(villeForm.codePostal) }}
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-primary">Ajouter</button>
+                            </td>
+                            {{ form_end(villeForm) }}
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
