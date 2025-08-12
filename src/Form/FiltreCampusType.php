@@ -17,6 +17,7 @@ class FiltreCampusType extends AbstractType
                 'contient',
                 TextType::class,
                 [
+                    "label" => "Le nom contient",
                     "required" => false
                 ]
             )

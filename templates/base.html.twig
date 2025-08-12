@@ -11,7 +11,7 @@
         {% endblock %}
     </head>
     <body>
-        <header>
+        <header class="sticky-top">
             {% include '_navbar.html.twig' %}
         </header>
         <main>
@@ -22,5 +22,14 @@
             {% endfor %}
             {% block body %}{% endblock %}
         </main>
+        <script>
+        function toggleTheme() {
+            theme = document.body.getAttribute("data-bs-theme") || "light"
+            newTheme = theme == "light" ? "dark" : "light"
+            document.body.setAttribute("data-bs-theme",newTheme)
+            localStorage.setItem("theme", newTheme)
+        }
+        document.body.setAttribute("data-bs-theme",localStorage.getItem("theme") || "light")
+        </script>
     </body>
 </html>

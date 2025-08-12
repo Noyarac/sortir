@@ -7,8 +7,8 @@
 
 {% block body %}
 	<section>
-		<h5>Filtrer les campus</h5>
 		<div class="container">
+		    <h5>Filtrer les campus</h5>
 			{{ form_start(filtreForm, {'attr': {'data-turbo': 'false'}})}}
 			<div class="row align-items-end">
 				<div class="col-6">
@@ -22,7 +22,7 @@
 		</div>
 	</section>
 	<hr>
-	<section>
+	<section style="max-height: 50vh; overflow-y: auto;">
 		<div class="container">
 			<table class="table">
 				<thead>
@@ -36,7 +36,7 @@
 						{{ form_start(newCampusForm, {"attr": {"data-turbo": "false"}})}}
 						<td class="col-6">{{ form_widget(newCampusForm.nom) }}{{ form_errors(newCampusForm.nom) }}</td>
 						<td class="col-auto">
-							<button class="btn btn-primary">Créer</button>
+							<button class="btn btn-primary">Ajouter</button>
 						</td>
 						{{ form_end(newCampusForm)}}
 					</tr>
