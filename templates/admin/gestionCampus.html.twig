@@ -31,7 +31,7 @@
                 <tbody>
                     <tr>
                         {{ form_start(newCampusForm, {"attr": {"data-turbo": "false"}})}}
-                        <td class="col-6">{{ form_widget(newCampusForm.nom) }}</td>
+                        <td class="col-6">{{ form_widget(newCampusForm.nom) }}{{ form_errors(newCampusForm.nom) }}</td>
                         <td class="col-auto">
                         <button class="btn btn-primary">Créer</button>
                         </td>
