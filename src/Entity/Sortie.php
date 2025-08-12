@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -21,6 +23,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ["groups" => ["getSortie"]]
 )]
+#[ApiFilter(SearchFilter::class, properties: [
+    'etat' => 'exact',
+    "dateHeureDebut" => "start"
+])]
 #[ORM\Entity(repositoryClass: SortieRepository::class)]
 #[DatesDebutEtLimiteInscription]
 class Sortie
