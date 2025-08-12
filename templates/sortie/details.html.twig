@@ -7,64 +7,67 @@
                 <span class="badge text-bg-danger">Annulée</span>
             {% endif %}
         </h3>
-        <dl class="dlStyle">
-            <div>
-                    <div>
-                        <dt>Nom</dt>
+        <dl>
+            <div class="row">
+                <div class="col col-md-6">
+                    <div class="m-4">
+                        <dt class="text-secondary">Nom</dt>
                         <dd>{{sortie.nom}}</dd>
                     </div>
-                    <div>
-                        <dt>Date et heure</dt>
+                    <div class="m-4">
+                        <dt class="text-secondary">Date et heure</dt>
                         <dd>{{sortie.dateHeureDebut | date("d/m/Y H:i")}}</dd>
                     </div>
-                    <div>
-                        <dt>Date limite d'inscription</dt>
+                    <div class="m-4">
+                        <dt class="text-secondary">Date limite d'inscription</dt>
                         <dd>{{sortie.dateLimiteInscription | date("d/m/Y")}}</dd>
                     </div>
-                    <div>
-                        <dt>Nombre de places</dt>
+                    <div class="m-4">
+                        <dt class="text-secondary">Nombre de places</dt>
                         <dd>{{sortie.nbInscriptionMax}}</dd>
                     </div>
-                    <div>
-                        <dt>Durée (en min)</dt>
+                    <div class="m-4">
+                        <dt class="text-secondary">Durée (en min)</dt>
                         <dd>{{sortie.duree}}
                             min</dd>
                     </div>
                 </div>
-            <div>
-                    <div>
-                        <dt>Campus</dt>
+                <div class="col col-md-6">
+                    <div class="m-4">
+                        <dt class="text-secondary">Campus</dt>
                         <dd>{{sortie.campus.nom}}</dd>
                     </div>
-                    <div>
-                        <dt>Ville</dt>
+                    <div class="m-4">
+                        <dt class="text-secondary">Ville</dt>
                         <dd>{{ sortie.lieu.ville.nom }}</dd>
                     </div>
-                    <div>
-                        <dt>Lieu</dt>
+                    <div class="m-4">
+                        <dt class="text-secondary">Lieu</dt>
                         <dd>{{ sortie.lieu.nom }}</dd>
                     </div>
-                    <div>
-                        <dt>Rue</dt>
+                    <div class="m-4">
+                        <dt class="text-secondary">Rue</dt>
                         <dd>{{ sortie.lieu.rue }}</dd>
                     </div>
-                    <div>
-                        <dt>Code postal</dt>
+                    <div class="m-4">
+                        <dt class="text-secondary">Code postal</dt>
                         <dd>{{ sortie.lieu.ville.codePostal }}</dd>
                     </div>
-                    <div>
-                        <dt>Latitude - Longitude</dt>
+                    <div class="m-4">
+                        <dt class="text-secondary">Latitude - Longitude</dt>
                         <dd>{{ sortie.lieu.latitude }}, {{ sortie.lieu.longitude }}</dd>
                     </div>
                 </div>
-            <div>
-                <div>
-                        <dt>Description</dt>
+            </div>
+            <div class="row">
+                <div class="col col-md-6">
+                    <div class="m-4">
+                        <dt class="text-secondary">Description</dt>
                         <dd>{{sortie.infosSortie | nl2br}}</dd>
                     </div>
-            </div>
-            <div>
-                <div>
+                </div>
+                <div class="col col-md-6">
+                    <div class="m-4">
                         <dt>Liste des participants inscrits</dt>
                         <dd>
                             <ul>
@@ -74,6 +77,7 @@
                             </ul>
                         </dd>
                     </div>
+                </div>
             </div>
         </dl>
     </div>
