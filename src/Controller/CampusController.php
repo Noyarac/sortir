@@ -15,22 +15,22 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted("ROLE_ADMIN")]
+#[Route('/admin/campus')]
 final class CampusController extends AbstractController
 {
-    #[Route('/admin/campus', name: 'admin_campus_list')]
+    #[Route('/', name: 'admin_campus_list')]
     public function adminCampusList(Request $request, CampusRepository $campusRepository, EntityManagerInterface $em): Response
     {
-        // Création d'un nouveau Campus
+        // Formulaire nouveau Campus
         $newCampus = new Campus;
-        $newCampusForm = $this->createForm(CampusType::class, $newCampus);
-        $newCampusForm->handleRequest($request);
-        if ($newCampusForm->isSubmitted() && $newCampusForm->isValid()) {
-            $em->persist($newCampus);
-            $em->flush();
-            $this->addFlash("success", $newCampus->getNom() . " a bien été ajouté.");
-            $this->redirectToRoute("admin_campus_list");
-        }
+        $newCampusForm = $this->createForm(
+            CampusType::class,
+            $newCampus,
+            [
+                "action" => $this->generateUrl("admin_campus_creer"),
+                "method" => "POST",
+            ]
+        );
 
         // Filtrer les campus à afficher
         $session = $request->getSession();
@@ -44,14 +44,41 @@ final class CampusController extends AbstractController
         }
 
         $allCampus = $campusRepository->findByFilter($filtreCampus);
+        $modifyCampusForms = array_combine(
+            array_map(fn($campus) => "campus" . $campus->getId(), $allCampus),
+            array_map(fn($campus) => $this->createForm(
+                CampusType::class,
+                $campus,
+                [
+                    "action" => $this->generateUrl("admin_campus_modifier", ["id" => $campus->getId()]),
+                    "method" => "POST",
+                ]
+            )->createView(), $allCampus)
+        );
 
         return $this->render(
             'admin/gestionCampus.html.twig',
-            compact("allCampus", "filtreForm", "newCampusForm")
+            compact("allCampus", "filtreForm", "newCampusForm", "modifyCampusForms")
         );
     }
 
-    #[Route('/admin/campus/{id}/supprimer', name: 'admin_campus_supprimer', requirements: ['id'=>'\d+'], methods: ['POST'])]
+    #[Route('/creer', name: 'admin_campus_creer', methods: ['POST'])]
+    public function adminCampusCreer(Request $request, EntityManagerInterface $em): Response
+    {
+        $campus = new Campus;
+        $campusForm = $this->createForm(CampusType::class, $campus);
+        $campusForm->handleRequest($request);
+        if ($campusForm->isSubmitted() && $campusForm->isValid()) {
+            $em->persist($campus);
+            $em->flush();
+            $this->addFlash('success', $campus->getNom(). ' a bien été créé.');
+        } else {
+            $this->addFlash("danger", "Le campus n'a pas été créé.");
+        }
+        return $this->redirectToRoute("admin_campus_list");
+    }
+
+    #[Route('/{id}/supprimer', name: 'admin_campus_supprimer', requirements: ['id'=>'\d+'], methods: ['POST'])]
     public function adminCampusSupprimer(Campus $campus, Request $request, SortieRepository $sortieRepository, EntityManagerInterface $em): Response
     {
         // Vérification token CSRF
@@ -70,6 +97,21 @@ final class CampusController extends AbstractController
         $em->remove($campus);
         $em->flush();
         $this->addFlash('success', $campus->getNom(). ' a bien été supprimé');
+
+        return $this->redirectToRoute("admin_campus_list");
+    }
+
+    #[Route('/{id}/modifier', name: 'admin_campus_modifier', requirements: ['id'=>'\d+'], methods: ['POST'])]
+    public function adminCampusModifier(Campus $campus, Request $request, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(CampusType::class, $campus);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($campus);
+            $em->flush();
+            $this->addFlash('success', $campus->getNom(). ' a bien été modifié.');
+        }
 
         return $this->redirectToRoute("admin_campus_list");
     }
