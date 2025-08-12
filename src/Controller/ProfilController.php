@@ -31,11 +31,12 @@ final class ProfilController extends AbstractController
         $userForm->handleRequest($request);
 
         if ($userForm->isSubmitted() && $userForm->isValid()) {
-            $plainPassword = $userForm->get('plainPassword')->getData();
+            $plainPassword = $user->getPlainPassword();
             if($plainPassword){
                 /** @var User $user */
                 $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
                 $user->setPassword($hashedPassword);
+                $user->setPlainPassword(null);
             }
 
             /** @var UploadedFile $image */

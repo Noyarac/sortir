@@ -43,6 +43,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[Assert\Regex(
+        pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={}\[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
+        message: "Le mot de passe doit comporter au minimum 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial : !@#$%^&*()_-+={}[]|:;/\"'<>,.?~",
+    )]
+    private ?string $plainPassword = null;
+
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message:"Veuillez indiquer votre nom")]
     #[Assert\Length(min: 2, max: 50, minMessage: 'Le nom doit comporter au moins 2 caractères',
@@ -264,6 +270,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Sortie>
      */
@@ -320,4 +338,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+
 }
