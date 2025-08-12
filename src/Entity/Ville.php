@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: VilleRepository::class)]
@@ -16,17 +17,20 @@ class Ville
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["getSortie"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message:"Merci d'indiquer le nom de la ville")]
     #[Assert\Length(min:2, max: 50, minMessage: "Un nom de ville doit contenir au moins 2 caractères",
         maxMessage: "Maximum 50 caractères autorisés")]
+    #[Groups(["getSortie"])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 5)]
     #[Assert\NotBlank(message:"Merci d'indiquer le code postal de la ville")]
     #[Assert\Regex(pattern: "/^\d{5}$/", message: "Le code postal doit contenir 5 chiffres")]
+    #[Groups(["getSortie"])]
     private ?string $codePostal = null;
 
     #[ORM\OneToMany(targetEntity: Lieu::class, mappedBy: 'ville', orphanRemoval: true)]

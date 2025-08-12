@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -21,11 +22,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["getSortie"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(message:"Veuillez indiquer votre adresse mail")]
     #[Assert\Email(message: "Veuillez entrer une adresse mail valide")]
+    #[Groups(["getSortie"])]
     private ?string $email = null;
 
     /**
@@ -44,24 +47,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message:"Veuillez indiquer votre nom")]
     #[Assert\Length(min: 2, max: 50, minMessage: 'Le nom doit comporter au moins 2 caractères',
     maxMessage:'Le nom doit comporter au maximum 50 caractères')]
+    #[Groups(["getSortie"])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message:"Veuillez indiquer votre prénom")]
     #[Assert\Length(min: 2, max: 50, minMessage: 'Le prénom doit comporter au moins 2 caractères',
         maxMessage:'Le prénom doit comporter au maximum 50 caractères')]
+    #[Groups(["getSortie"])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message:"Veuillez indiquer votre pseudo")]
     #[Assert\Length(min: 2, max: 50, minMessage: 'Le pseudo doit comporter au moins 2 caractères',
         maxMessage:'Le pseudo doit comporter au maximum 50 caractères')]
+    #[Groups(["getSortie"])]
     private ?string $pseudo = null;
 
 
     #[Assert\Regex(pattern:"/^(0[67])([ .]?\d{2}){4}$/",
         message:"Oops! le format du numéro ne semble pas valide. Le numéro de téléphone doit commencer par 06 ou 07. Les chiffres peuvent être séparés par un espace ou un point.")]
     #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(["getSortie"])]
     private ?string $telephone = null;
 
     #[ORM\Column]
@@ -69,6 +76,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["getSortie"])]
     private ?Campus $campus = null;
 
     /**

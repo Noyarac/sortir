@@ -1,6 +1,11 @@
 api_platform:
-    title: Hello API Platform
+    title: Sortir.com API
     version: 1.0.0
+    formats:
+        json: ["application/json"]
+    docs_formats:
+        json: ["application/json"]
+        html: ["text/html"]
     defaults:
         stateless: true
         cache_headers:
