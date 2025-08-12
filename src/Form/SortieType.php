@@ -6,6 +6,7 @@ use App\Entity\Campus;
 use App\Entity\Lieu;
 use App\Entity\Sortie;
 use App\Entity\Ville;
+use App\Repository\VilleRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -66,6 +67,17 @@ class SortieType extends AbstractType
                 'choice_label' => 'nom',
                 'disabled' => true,
             ])
+            ->add('ville', EntityType::class, [
+                'label' => 'Ville',
+                'class' => Ville::class,
+                'choice_label' => 'nom',
+                'placeholder' => 'Choisissez une ville',
+                'mapped' => false,
+                'query_builder' => function (VilleRepository $villeRepository) {
+                    return $villeRepository->createQueryBuilder('v')
+                        ->orderBy('v.nom', 'ASC');
+                }
+            ])
             ->add('lieu', EntityType::class, [
                 'label' => 'Lieu',
                 'placeholder' => 'Choisissez un lieu',
@@ -74,11 +86,6 @@ class SortieType extends AbstractType
             ])
             ->add('rue', TextType::class, [
                 'label' => 'Rue',
-                'mapped' => false,
-                'disabled' => true,
-            ])
-            ->add('ville', TextType::class, [
-                'label' => 'Ville',
                 'mapped' => false,
                 'disabled' => true,
             ])
