@@ -17,7 +17,7 @@
         <main>
             {% for label,messages in app.flashes %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ label }} mt-2 px-2 flash-message">{{ message }}</div>
+                    <div class="alert alert-{{ label }} mt-2 px-2 flash-message">{{ message | nl2br }}</div>
                 {% endfor %}
             {% endfor %}
             {% block body %}{% endblock %}

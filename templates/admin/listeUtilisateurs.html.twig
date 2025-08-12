@@ -3,33 +3,54 @@
 {% block title %}{{parent()}}| Liste utilisateurs{% endblock %}
 
 {% block body %}
-    <div class="container">
-        <div class="mb-3 d-flex align-items-center justify-content-between">
-            <h3>Liste utilisateurs</h3>
-            <a href="{{ path('admin_creerUtilisateur') }}" class="btn btn-secondary">Ajouter un nouvel utilisateur</a>
+    <section>
+        <div class="container">
+            <div class="mb-4 d-flex flex-column align-items-start justify-content-center">
+                <h3 class="mb-3">Ajout utilisateur(s)</h3>
+                <a href="{{ path('admin_creerUtilisateur') }}" class="btn btn-secondary">Ajouter un nouvel utilisateur</a>
+            </div>
+            <div class="mb-5">
+                {{ form_start(userImportForm, {'attr': {'class': 'd-flex align-items-end w-100'}}) }}
+                <div class="flex-fill me-2">
+                    {{ form_label(userImportForm.csvFile) }}
+                    {{ form_widget(userImportForm.csvFile, {'attr': {'class': 'form-control w-100'}}) }}
+                    {{ form_errors(userImportForm.csvFile) }}
+                </div>
+                <div class="flex-shrink-0">
+                    <button type="submit" class="btn btn-secondary">Ajouter les utilisateurs</button>
+                </div>
+                {{ form_end(userImportForm) }}
+            </div>
         </div>
-        {% if listeUtilisateurs is not empty %}
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Pseudo</th>
-                <th>Campus</th>
-                <th>Compte actif</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for utilisateur in listeUtilisateurs %}
-                <tr>
-                    <td><a href="{{ path('profil_afficher', {'id': utilisateur.id}) }}">{{ utilisateur.pseudo }}</a></td>
-                    <td>{{ utilisateur.campus}}</td>
-                    <td>{{ utilisateur.actif ? "✔" : "" }}</td>
-                    <td>
-                        <a href="{{ path('admin_modifierProfilUtilisateurs', {'id' : utilisateur.id}) }}" class="btn btn-outline-secondary mb-1 w-100">Modifier</a>
-                    </td>
-                </tr>
-            {% endfor %}
-            <tbody>
-        {% endif %}
-    </div>
+    </section>
+    <hr>
+    <section>
+        <div class="container">
+            <h3>Liste utilisateurs</h3>
+            {% if listeUtilisateurs is not empty %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Pseudo</th>
+                        <th>Campus</th>
+                        <th>Compte actif</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for utilisateur in listeUtilisateurs %}
+                        <tr>
+                            <td><a href="{{ path('profil_afficher', {'id': utilisateur.id}) }}">{{ utilisateur.pseudo }}</a></td>
+                            <td>{{ utilisateur.campus}}</td>
+                            <td>{{ utilisateur.actif ? "✔" : "" }}</td>
+                            <td>
+                                <a href="{{ path('admin_modifierProfilUtilisateurs', {'id' : utilisateur.id}) }}" class="btn btn-outline-secondary mb-1 w-100">Modifier</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            </div>
+    </section>
 {% endblock %}

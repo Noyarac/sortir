@@ -7,11 +7,13 @@ use App\Entity\User;
 use App\Entity\Ville;
 use App\Form\DTO\FiltreVille;
 use App\Form\FiltreVilleType;
+use App\Form\UserImportType;
 use App\Form\UserType;
 use App\Form\VilleType;
 use App\Repository\SortieRepository;
 use App\Repository\UserRepository;
 use App\Repository\VilleRepository;
+use App\Service\UserImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
@@ -119,13 +121,36 @@ final class AdministrationController extends AbstractController
     }
 
     #[Route('/utilisateurs/liste', name: 'admin_listeUtilisateurs', methods: ['GET', 'POST'])]
-    public function listeUtilisateurs(EntityManagerInterface $entityManager): Response
+    public function listeUtilisateurs(EntityManagerInterface $entityManager, Request $request, UserImportService $userImportService): Response
     {
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
         $listeUtilisateurs = $userRepository->getListeUtilisateurs();
+
+        $userImportForm = $this->createForm(UserImportType::class);
+        $userImportForm->handleRequest($request);
+
+        if($userImportForm->isSubmitted() && $userImportForm->isValid()){
+            //Le fichier doit contenir les infos suivantes : campus, nom, prenom, email
+            $csvFile = $userImportForm->get('csvFile')->getData();
+            //fichier transmis au service pour traitement (création utilisateurs)
+            try{
+                $nbUtilisateursCrees = $userImportService->importFromFile($csvFile->getPathname());
+                $message = $nbUtilisateursCrees == 1 ? "Un utilisateur a été créé" : "{$nbUtilisateursCrees} utilisateurs ont été créés";
+                $this->addFlash('success', $message);
+                return $this->redirectToRoute('admin_listeUtilisateurs');
+            } catch (\RuntimeException $e) {
+                $this->addFlash('danger', $e->getMessage());
+                return $this->redirectToRoute('admin_listeUtilisateurs');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', "Une erreur technique est survenue lors de l'import. Veuillez réésayer plus tard");
+                return $this->redirectToRoute('admin_listeUtilisateurs');
+            }
+        }
+
         return $this->render('admin/listeUtilisateurs.html.twig', [
             'listeUtilisateurs' => $listeUtilisateurs,
+            'userImportForm' => $userImportForm,
         ]);
     }
 
@@ -173,9 +198,10 @@ final class AdministrationController extends AbstractController
 
         $userForm->handleRequest($request);
         if($userForm->isSubmitted() && $userForm->isValid()){
-            $plainPassword = $userForm->get('plainPassword')->getData();
+            $plainPassword = $user->getPlainPassword();
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
+            $user->setPlainPassword(null);
 
             if ($userForm->get("deleteImage")->getViewData()) {
                 $fileSystem = new Filesystem;
