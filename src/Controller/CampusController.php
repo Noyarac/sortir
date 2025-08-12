@@ -27,6 +27,7 @@ final class CampusController extends AbstractController
         if ($newCampusForm->isSubmitted() && $newCampusForm->isValid()) {
             $em->persist($newCampus);
             $em->flush();
+            $this->addFlash("success", $newCampus->getNom() . " a bien été ajouté.");
             $this->redirectToRoute("admin_campus_list");
         }
 
