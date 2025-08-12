@@ -2,19 +2,20 @@
 
 namespace App\Controller;
 
+use App\Entity\Sortie;
 use App\Entity\User;
 use App\Entity\Ville;
 use App\Form\DTO\FiltreVille;
 use App\Form\FiltreVilleType;
 use App\Form\UserType;
 use App\Form\VilleType;
+use App\Repository\SortieRepository;
 use App\Repository\UserRepository;
 use App\Repository\VilleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -40,20 +41,27 @@ final class AdministrationController extends AbstractController
     #[Route('/villes', name: 'admin_villes', methods: ['GET', 'POST'])]
     public function gestionVilles(Request $request, EntityManagerInterface $entityManager): Response
     {
-        //Création du formulaire de filtre
+        $villeRepository = $entityManager->getRepository(Ville::class);
+
+        //On remonte de la BDD toutes les villes
+        $villes = $villeRepository->findBy([], ['nom' => 'ASC']);
+
+        //Formulaire de création d'une nouvelle ville
+        $ville= new Ville();
+        $villeForm = $this->createForm(VilleType::class, $ville);
+        $villeForm->handleRequest($request);
+
+        if ($villeForm->isSubmitted() && $villeForm->isValid()) {
+            $entityManager->persist($ville);
+            $entityManager->flush();
+            $this->addFlash('success','Ville créée avec succès!');
+            return $this->redirectToRoute('admin_villes');
+        }
+
+        //Formulaire de filtre
         $filtreVille = new filtreVille();
         /** @var VilleRepository $villeRepository */
         $filtreVilleForm = $this->createForm(FiltreVilleType::class, $filtreVille);
-
-        //Création du formulaire pour créer une nouvelle ville
-        $ville= new Ville();
-        $villeForm = $this->createForm(VilleType::class, $ville);
-
-        //On remonte de la BDD toutes les villes
-        $villeRepository = $entityManager->getRepository(Ville::class);
-        $villes = $villeRepository->findBy([], ['nom' => 'ASC']);
-
-        //Gestion du formulaire de filtre
         $filtreVilleForm->handleRequest($request);
 
         if ($filtreVilleForm->isSubmitted() && $filtreVilleForm->isValid()) {
@@ -66,21 +74,47 @@ final class AdministrationController extends AbstractController
             ]);
         }
 
-        //Gestion du formulaire de création d'une ville
-        $villeForm->handleRequest($request);
-
-        if ($villeForm->isSubmitted() && $villeForm->isValid()) {
-            $entityManager->persist($ville);
-            $entityManager->flush();
-            $this->addFlash('success','Ville créée avec succès!');
-            return $this->redirectToRoute('admin_villes');
-        }
-
         return $this->render('admin/gestionVilles.html.twig', [
             "filtreVilleForm" => $filtreVilleForm,
             "villes" => $villes,
             "villeForm" => $villeForm,
         ]);
+    }
+
+    #[Route('/villes/{id}/modifier', name: 'admin_modifierVille', requirements: ['id'=>'\d+'], methods: ['GET', 'POST'])]
+    public function modifierVille(Ville $ville, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $villeForm = $this->createForm(VilleType::class, $ville);
+        $villeForm->handleRequest($request);
+
+        if ($villeForm->isSubmitted() && $villeForm->isValid()) {
+            $entityManager->flush();
+            $this->addFlash('success', 'Ville mise à jour');
+            return $this->redirectToRoute('admin_villes');
+        }
+
+        return $this->render('admin/modifierVille.html.twig', [
+            "villeForm" => $villeForm,
+        ]);
+    }
+
+    #[Route('/villes/{id}/supprimer', name: 'admin_supprimerVille', requirements: ['id'=>'\d+'], methods: ['POST'])]
+    public function supprimerVille(Ville $ville, EntityManagerInterface $entityManager): Response
+    {
+        //Vérification absence référencement de la ville dans une sortie
+        /** @var SortieRepository $sortieRepository */
+        $sortieRepository = $entityManager->getRepository(Sortie::class);
+        $nbSortiesUtilisantVille = $sortieRepository->countByVille($ville);
+        if ($nbSortiesUtilisantVille > 0) {
+            $this->addFlash("danger", "Cette ville ne peut pas être supprimée, elle est référencée dans une ou plusieurs sorties.");
+            return $this->redirectToRoute('admin_villes');
+        }
+
+
+        $entityManager->remove($ville);
+        $entityManager->flush();
+        $this->addFlash('success', 'La ville '.$ville->getNom(). ' a bien été supprimée');
+        return $this->redirectToRoute('admin_villes');
     }
 
     #[Route('/utilisateurs/liste', name: 'admin_listeUtilisateurs', methods: ['GET', 'POST'])]

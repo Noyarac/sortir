@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Etat;
 use App\Entity\Sortie;
+use App\Entity\Ville;
 use App\Form\DTO\FiltreSortie;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -92,6 +93,17 @@ class SortieRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function countByVille(Ville $ville): int
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.lieu', 'l')
+            ->join('l.ville', 'v')
+            ->where('v = :ville')
+            ->setParameter('ville', $ville)
+            ->select('COUNT(s.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
     //    /**
     //     * @return Sortie[] Returns an array of Sortie objects
     //     */

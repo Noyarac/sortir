@@ -4,8 +4,8 @@
 
 {% block body %}
     <section>
-        {{ form_start(filtreVilleForm, {'attr': {'data-turbo': 'false'}})}}
         <div class="container">
+            {{ form_start(filtreVilleForm, {'attr': {'data-turbo': 'false'}})}}
             <div class="row align-items-end">
                 <h5>Filtrer les villes</h5>
                 <div class="col-6">
@@ -22,41 +22,47 @@
     <section>
         <div class="container">
             {{ form_start(villeForm, {'attr': {'data-turbo': 'false'}}) }}
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Ville</th>
-                    <th>Code postal</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr>
-
-                        <td>
-                            {{ form_row(villeForm.nom, {'label':false}) }}
-                        </td>
-                        <td>
-                            {{ form_row(villeForm.codePostal,{'label':false}) }}
-                        </td>
-                        <td>
-                            <button type="submit" class="btn btn-primary w-100">Ajouter</button>
-                        </td>
-
-                    </tr>
-                    {% if villes is not empty %}
-                        {% for ville in villes %}
-                            <tr>
-                                <td class="col-6">{{ ville.nom | capitalize }}</td>
-                                <td class="col-3">{{ ville.codePostal }}</td>
-                                <td class="col-auto">
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% endif %}
-                </tbody>
-            </table>
+            <div class="row align-items-end">
+                <div class="col-6">
+                    {{ form_row(villeForm.nom) }}
+                </div>
+                <div class="col-3">
+                    {{ form_row(villeForm.codePostal) }}
+                </div>
+                <div class="col-auto mb-3">
+                    <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                </div>
             {{ form_end(villeForm) }}
+            <div style="max-height: 50vh; overflow-y: auto;">
+                <table class="table" >
+                    <thead>
+                    <tr>
+                        <th>Ville</th>
+                        <th>Code postal</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% if villes is not empty %}
+                            {% for ville in villes %}
+                                <tr>
+                                    <td class="col-6">{{ ville.nom | upper }}</td>
+                                    <td class="col-3">{{ ville.codePostal }}</td>
+                                    <td class="col-auto d-flex gap-2">
+                                        <a href="{{ path('admin_modifierVille', {'id': ville.id}) }}" class="btn btn-outline-secondary">Modifier</a>
+                                        <form method="post"
+                                              action="{{ path('admin_supprimerVille', parameters: {id: ville.id}) }}"
+                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette ville ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('suppression_ville_' ~ ville.id) }}">
+                                            <button class="btn btn-outline-danger" type="submit">Supprimer</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
             {% if villes is empty %}
                 <p>Aucune ville ne correspond au critère de recherche.</p>
             {% endif %}
