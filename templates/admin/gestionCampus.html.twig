@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{parent()}}
+	| Campus
+{% endblock %}
+
+{% block body %}
+	<section>
+		<h5>Filtrer les campus</h5>
+		<div class="container">
+			{{ form_start(filtreForm, {'attr': {'data-turbo': 'false'}})}}
+			<div class="row align-items-end">
+				<div class="col-6">
+					{{ form_widget(filtreForm) }}
+				</div>
+				<div class="col-auto mb-3">
+					<button type="submit" class="btn btn-primary">Rechercher</button>
+				</div>
+			</div>
+			{{ form_end(filtreForm) }}
+		</div>
+	</section>
+	<hr>
+	<section>
+		<div class="container">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Nom</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						{{ form_start(newCampusForm, {"attr": {"data-turbo": "false"}})}}
+						<td class="col-6">{{ form_widget(newCampusForm.nom) }}{{ form_errors(newCampusForm.nom) }}</td>
+						<td class="col-auto">
+							<button class="btn btn-primary">Créer</button>
+						</td>
+						{{ form_end(newCampusForm)}}
+					</tr>
+					{% for campus in allCampus %}
+						<tr id="display_campus_{{ campus.id }}">
+							<td class="col-6">{{ campus.nom | title }}</td>
+							<td class="col-auto d-flex flex-row gap-2">
+								<button id="modifyButton_{{ campus.id }}" class="btn btn-outline-secondary" onclick="swapModifyRow(this)">Modifier</button>
+								<form method="post" action="{{ path('admin_campus_supprimer', parameters: {id: campus.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce campus ?');">
+									<input type="hidden" name="_token" value="{{ csrf_token('suppression_campus_' ~ campus.id) }}">
+									<button class="btn btn-outline-danger" type="submit">Supprimer</button>
+								</form>
+
+							</td>
+						</tr>
+						<tr style="display: none;" id="modify_campus_{{ campus.id }}">
+							{{ form_start(modifyCampusForms["campus" ~ campus.id])}}
+							<td class="col-6">{{ form_widget(modifyCampusForms["campus" ~ campus.id].nom)}}{{ form_errors(modifyCampusForms["campus" ~ campus.id].nom)}}</td>
+							<td class="col-auto d-flex flex-row gap-2">
+								<button class="btn btn-outline-success">Valider</button>
+								{{ form_end(modifyCampusForms["campus" ~ campus.id])}}
+								<button id="cancelModify_{{campus.id}}" class="btn btn-outline-secondary" onclick="swapModifyRow(this)">Annuler</button>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</section>
+<script>
+function swapModifyRow(button) {
+    const id = button.id.split("_").pop()
+    display = document.getElementById("display_campus_" + id)
+    display.style.display = display.style.display == "none" ? "table-row" : "none"
+    modify = document.getElementById("modify_campus_" + id)
+    modify.style.display = modify.style.display == "none" ? "table-row" : "none"
+}
+</script>
+	{% endblock %}
