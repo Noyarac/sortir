@@ -1,51 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{parent()}} | Campus{% endblock %}
-
-{% block body %}
-    <section>
-        <h5>Filtrer les campus</h5>
-        <div class="container">
-            {{ form_start(filtreForm, {'attr': {'data-turbo': 'false'}})}}
-            <div class="row align-items-end">
-                <div class="col-6">
-                    {{ form_widget(filtreForm) }}
-                </div>
-                <div class="col-auto mb-3">
-                    <button type="submit" class="btn btn-primary">Rechercher</button>
-                </div>
-            </div>
-            {{ form_end(filtreForm) }}
-        </div>
-    </section>
-    <hr>
-    <section>
-        <div class="container">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        {{ form_start(newCampusForm, {"attr": {"data-turbo": "false"}})}}
-                        <td class="col-6">{{ form_widget(newCampusForm.nom) }}{{ form_errors(newCampusForm.nom) }}</td>
-                        <td class="col-auto">
-                        <button class="btn btn-primary">Créer</button>
-                        </td>
-                        {{ form_end(newCampusForm)}}
-                    </tr>
-                    {% for campus in allCampus %}
-                        <tr>
-                            <td class="col-6">{{ campus.nom | title }}</td>
-                            <td class="col-auto">
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-    </section>
+{% block title %}
+	{{parent()}}
+	| Campus
 {% endblock %}
 
+{% block body %}
+	<section>
+		<h5>Filtrer les campus</h5>
+		<div class="container">
+			{{ form_start(filtreForm, {'attr': {'data-turbo': 'false'}})}}
+			<div class="row align-items-end">
+				<div class="col-6">
+					{{ form_widget(filtreForm) }}
+				</div>
+				<div class="col-auto mb-3">
+					<button type="submit" class="btn btn-primary">Rechercher</button>
+				</div>
+			</div>
+			{{ form_end(filtreForm) }}
+		</div>
+	</section>
+	<hr>
+	<section>
+		<div class="container">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Nom</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						{{ form_start(newCampusForm, {"attr": {"data-turbo": "false"}})}}
+						<td class="col-6">{{ form_widget(newCampusForm.nom) }}{{ form_errors(newCampusForm.nom) }}</td>
+						<td class="col-auto">
+							<button class="btn btn-primary">Créer</button>
+						</td>
+						{{ form_end(newCampusForm)}}
+					</tr>
+					{% for campus in allCampus %}
+						<tr>
+							<td class="col-6">{{ campus.nom | title }}</td>
+							<td class="col-auto">
+								<form method="post" action="{{ path('admin_campus_supprimer', parameters: {id: campus.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce campus ?');">
+									<input type="hidden" name="_token" value="{{ csrf_token('suppression_campus_' ~ campus.id) }}">
+									<button class="btn btn-outline-danger" type="submit">Supprimer</button>
+								</form>
+
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</section>
+	{% endblock %}
