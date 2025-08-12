@@ -7,11 +7,13 @@ use App\Entity\User;
 use App\Entity\Ville;
 use App\Form\DTO\FiltreVille;
 use App\Form\FiltreVilleType;
+use App\Form\UserImportType;
 use App\Form\UserType;
 use App\Form\VilleType;
 use App\Repository\SortieRepository;
 use App\Repository\UserRepository;
 use App\Repository\VilleRepository;
+use App\Service\UserImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
@@ -119,16 +121,32 @@ final class AdministrationController extends AbstractController
     }
 
     #[Route('/utilisateurs/liste', name: 'admin_listeUtilisateurs', methods: ['GET', 'POST'])]
-    public function listeUtilisateurs(EntityManagerInterface $entityManager): Response
+    public function listeUtilisateurs(EntityManagerInterface $entityManager, Request $request, UserImportService $userImportService): Response
     {
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
         $listeUtilisateurs = $userRepository->getListeUtilisateurs();
 
-        $this->
+        $userImportForm = $this->createForm(UserImportType::class);
+        $userImportForm->handleRequest($request);
+
+        if($userImportForm->isSubmitted() && $userImportForm->isValid()){
+            //Ajout traitement fichier csv d'import des utilisateurs
+            $csvFile = $userImportForm->get('csvFile')->getData();
+            if(!file_exists($csvFile)){
+                $this->addFlash('danger', "Le fichier '.$csvFile.' n'existe pas");
+                return $this->redirectToRoute('admin_listeUtilisateurs');
+            }
+            //on récupère le chemin temporaire où est stocké le fichier
+            $filePath = $csvFile->getPathname();
+            $nbUtilisateursCrees = $userImportService->importFromFile($filePath);
+            $this->addFlash('success', $nbUtilisateursCrees. ' utilisateur(s) ont été créés');
+            return $this->redirectToRoute('admin_listeUtilisateurs');
+        }
 
         return $this->render('admin/listeUtilisateurs.html.twig', [
             'listeUtilisateurs' => $listeUtilisateurs,
+            'userImportForm' => $userImportForm,
         ]);
     }
 
