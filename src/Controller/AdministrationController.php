@@ -130,6 +130,9 @@ final class AdministrationController extends AbstractController
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
         $listeUtilisateurs = $userRepository->getListeUtilisateurs();
+
+        $this->
+
         return $this->render('admin/listeUtilisateurs.html.twig', [
             'listeUtilisateurs' => $listeUtilisateurs,
         ]);
