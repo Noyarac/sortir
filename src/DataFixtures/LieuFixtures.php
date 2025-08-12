@@ -17,12 +17,20 @@ class LieuFixtures extends Fixture implements DependentFixtureInterface
         $villeRepository = $manager->getRepository(Ville::class);
         $villes = $villeRepository->findAll();
 
-        $emplacementsLieu = ['Quartier', 'Place', 'Parc'];
-        $nomEmplacements = ['de la République', 'du Marché', 'des Fleurs', 'du Château', 'des Tilleuls', 'de la liberté'];
+        $emplacementsLieu = ['Quartier', 'Place', 'Parc', 'Jardin', 'Promenade', 'Esplanade', 'Sentier', 'Square'];
+        $nomEmplacements = ['de la République', 'du Marché', 'des Fleurs', 'du Château', 'des Tilleuls', 'de la Liberté', 'du lac', 'de la plage', 'du moulin'];
+
+        $nomsLieux = [];
 
         for ($i = 1; $i <= 20; $i++) {
+            do{
+                $nom = $faker->randomElement($emplacementsLieu)." ".$faker->randomElement($nomEmplacements);
+            } while (in_array($nom, $nomsLieux));
+
+            $nomsLieux[] = $nom;
+
             $lieu = new Lieu();
-            $lieu->setNom($faker->randomElement($emplacementsLieu)." ".$faker->randomElement($nomEmplacements));
+            $lieu->setNom($nom);
             $lieu->setRue(ucfirst($faker->streetName()));
             $lieu->setVille($faker->randomElement($villes));
             $lieu->setLatitude($faker->latitude());

@@ -22,8 +22,8 @@
             </div>
             <div class="col-md-6">
                 {{ form_row(sortieForm.campus) }}
-                {{ form_row(sortieForm.lieu) }}
                 {{ form_row(sortieForm.ville) }}
+                {{ form_row(sortieForm.lieu) }}
                 {{ form_row(sortieForm.codePostal) }}
                 {{ form_row(sortieForm.rue) }}
                 <div class="row">
@@ -67,36 +67,75 @@
         document.addEventListener('turbo:render', init);
 
         function init() {
+            const villeSelect = document.getElementById('{{ sortieForm.ville.vars.id }}')
             const lieuSelect = document.getElementById('{{ sortieForm.lieu.vars.id }}');
-            if (!lieuSelect) return;
+
+            if(villeSelect.value){
+                const selectedLieuId = '{{ sortie.lieu ? sortie.lieu.id : '' }}'
+                chargerLieuxEnFonctionDeVille(villeSelect.value, selectedLieuId);
+            }
+
+            if (lieuSelect.value) {
+                chargerDonneesLieu(lieuSelect.value);
+            }
+
+            function chargerLieuxEnFonctionDeVille(villeId, selectedLieuId = null){
+                if(!villeId){
+                    fetch(`/lieu`)
+                        .then(response=>response.json())
+                        .then( lieux => chargerDonneesSelectLieu(lieux, selectedLieuId));
+                    return;
+                }
+                fetch(`/lieu/ville/${villeId}`)
+                    .then(response=> response.json())
+                    .then( lieux => chargerDonneesSelectLieu(lieux, selectedLieuId));
+            }
+
+            function chargerDonneesSelectLieu(lieux, selectedLieuId = null){
+                lieuSelect.innerHTML = '<option value="">Choisissez un lieu</option>';
+
+                lieux.forEach(lieu => {
+                    const option = document.createElement('option');
+                    option.value = lieu.id;
+                    option.textContent = lieu.nom;
+                    if(selectedLieuId && lieu.id == selectedLieuId){
+                        option.selected = true;
+                    }
+                    lieuSelect.appendChild(option);
+                });
+            }
 
             function chargerDonneesLieu(lieuId) {
                 if (!lieuId) {
-                    document.getElementById('{{ sortieForm.rue.vars.id }}').value = '';
-                    document.getElementById('{{ sortieForm.codePostal.vars.id }}').value = '';
-                    document.getElementById('{{ sortieForm.ville.vars.id }}').value = '';
-                    document.getElementById('{{ sortieForm.latitude.vars.id }}').value = '';
-                    document.getElementById('{{ sortieForm.longitude.vars.id }}').value = '';
+                    viderChampsLieux();
                     return;
                 }
                 fetch(`/lieu/${lieuId}`)
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('{{ sortieForm.rue.vars.id }}').value = data.rue || '';
-                        document.getElementById('{{ sortieForm.ville.vars.id }}').value = data.ville || '';
                         document.getElementById('{{ sortieForm.codePostal.vars.id }}').value = data.codePostal || '';
                         document.getElementById('{{ sortieForm.latitude.vars.id }}').value = data.latitude || '';
                         document.getElementById('{{ sortieForm.longitude.vars.id }}').value = data.longitude || '';
                     });
             }
 
+            function viderChampsLieux(){
+                document.getElementById('{{ sortieForm.rue.vars.id }}').value = '';
+                document.getElementById('{{ sortieForm.codePostal.vars.id }}').value ='';
+                document.getElementById('{{ sortieForm.latitude.vars.id }}').value = '';
+                document.getElementById('{{ sortieForm.longitude.vars.id }}').value = '';
+            }
+
+            villeSelect.addEventListener('change', function(){
+                chargerLieuxEnFonctionDeVille(this.value);
+                viderChampsLieux();
+            });
+
             lieuSelect.addEventListener('change', function() {
                 chargerDonneesLieu(this.value);
             });
 
-            if (lieuSelect.value) {
-                chargerDonneesLieu(lieuSelect.value);
-            }
         }
 
     </script>
