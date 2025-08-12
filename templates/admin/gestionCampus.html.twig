@@ -21,9 +21,6 @@
     <hr>
     <section>
         <div class="container">
-            {% if allCampus is empty %}
-                <p>Aucune campus ne correspond au critère de recherche.</p>
-            {% else %}
             <table class="table">
                 <thead>
                 <tr>
@@ -32,6 +29,14 @@
                 </tr>
                 </thead>
                 <tbody>
+                    <tr>
+                        {{ form_start(newCampusForm, {"attr": {"data-turbo": "false"}})}}
+                        <td class="col-6">{{ form_widget(newCampusForm.nom) }}</td>
+                        <td class="col-auto">
+                        <button class="btn btn-primary">Créer</button>
+                        </td>
+                        {{ form_end(newCampusForm)}}
+                    </tr>
                     {% for campus in allCampus %}
                         <tr>
                             <td class="col-6">{{ campus.nom | title }}</td>
@@ -41,7 +46,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-            {% endif %}
     </section>
 {% endblock %}
 
