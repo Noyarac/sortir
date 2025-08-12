@@ -34,7 +34,7 @@ final class AdministrationController extends AbstractController
         ]);
     }
 
-    #[Route('/villes', name: 'admin_villes', methods: ['GET', 'POST'])]
+    #[Route('/villes', name: 'admin_gestionVilles', methods: ['GET', 'POST'])]
     public function gestionVilles(Request $request, EntityManagerInterface $entityManager): Response
     {
         $villeRepository = $entityManager->getRepository(Ville::class);
@@ -51,7 +51,7 @@ final class AdministrationController extends AbstractController
             $entityManager->persist($ville);
             $entityManager->flush();
             $this->addFlash('success','Ville créée avec succès!');
-            return $this->redirectToRoute('admin_villes');
+            return $this->redirectToRoute('admin_gestionVilles');
         }
 
         //Formulaire de filtre
@@ -120,8 +120,8 @@ final class AdministrationController extends AbstractController
         return $this->redirectToRoute('admin_villes');
     }
 
-    #[Route('/utilisateurs/liste', name: 'admin_listeUtilisateurs', methods: ['GET', 'POST'])]
-    public function listeUtilisateurs(EntityManagerInterface $entityManager, Request $request, UserImportService $userImportService): Response
+    #[Route('/utilisateurs', name: 'admin_gestionUtilisateurs', methods: ['GET', 'POST'])]
+    public function gestionUtilisateurs(EntityManagerInterface $entityManager, Request $request, UserImportService $userImportService): Response
     {
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
@@ -138,17 +138,17 @@ final class AdministrationController extends AbstractController
                 $nbUtilisateursCrees = $userImportService->importFromFile($csvFile->getPathname());
                 $message = $nbUtilisateursCrees == 1 ? "Un utilisateur a été créé" : "{$nbUtilisateursCrees} utilisateurs ont été créés";
                 $this->addFlash('success', $message);
-                return $this->redirectToRoute('admin_listeUtilisateurs');
+                return $this->redirectToRoute('admin_gestionUtilisateurs');
             } catch (\RuntimeException $e) {
                 $this->addFlash('danger', $e->getMessage());
-                return $this->redirectToRoute('admin_listeUtilisateurs');
+                return $this->redirectToRoute('admin_gestionUtilisateurs');
             } catch (\Exception $e) {
                 $this->addFlash('danger', "Une erreur technique est survenue lors de l'import. Veuillez réésayer plus tard");
-                return $this->redirectToRoute('admin_listeUtilisateurs');
+                return $this->redirectToRoute('admin_gestionUtilisateurs');
             }
         }
 
-        return $this->render('admin/listeUtilisateurs.html.twig', [
+        return $this->render('admin/gestionUtilisateurs.html.twig', [
             'listeUtilisateurs' => $listeUtilisateurs,
             'userImportForm' => $userImportForm,
         ]);
