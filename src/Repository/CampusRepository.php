@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Campus;
+use App\Form\DTO\FiltreCampus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +16,21 @@ class CampusRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Campus::class);
     }
+
+    public function findByFilter(FiltreCampus $filtreCampus): array
+    {
+        $qb = $this->createQueryBuilder('s');
+        if ($filtreCampus->getContient()) {
+            $qb->andWhere($qb->expr()->like('s.nom', ':contient'))
+                ->setParameter("contient", "%" . $filtreCampus->getContient() . "%");
+        }
+
+        return $qb->orderBy('s.nom', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 
     //    /**
     //     * @return Campus[] Returns an array of Campus objects

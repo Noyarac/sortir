@@ -6,8 +6,10 @@ use App\Repository\CampusRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CampusRepository::class)]
+#[UniqueEntity("nom")]
 class Campus
 {
     #[ORM\Id]
@@ -112,7 +114,7 @@ class Campus
 
         return $this;
     }
-    
+
     public function __toString()
     {
         return $this->nom;

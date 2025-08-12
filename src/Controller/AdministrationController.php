@@ -32,12 +32,6 @@ final class AdministrationController extends AbstractController
         ]);
     }
 
-    #[Route('/campus', name: 'admin_campus', methods: ['GET', 'POST'])]
-    public function gestionCampus(): Response
-    {
-        return $this->render('admin/gestionCampus.html.twig', []);
-    }
-
     #[Route('/villes', name: 'admin_villes', methods: ['GET', 'POST'])]
     public function gestionVilles(Request $request, EntityManagerInterface $entityManager): Response
     {

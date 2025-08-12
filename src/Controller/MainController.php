@@ -29,7 +29,7 @@ final class MainController extends AbstractController
 
         // Ecrasement du filtre si présent dans la session
         $session = $request->getSession();
-        $filtreSortie = $session->get("filtre") ?: $filtreSortie;
+        $filtreSortie = $session->get("filtreSortie") ?: $filtreSortie;
 
         // Rechargement de l'objet Campus
         $filtreSortie->setCampus($campusRepository->find($filtreSortie->getCampus()->getId()));
@@ -39,7 +39,7 @@ final class MainController extends AbstractController
         $filtreForm->handleRequest($request);
 
         if ($filtreForm->isSubmitted() && $filtreForm->isValid()) {
-            $session->set("filtre", $filtreSortie);
+            $session->set("filtreSortie", $filtreSortie);
             $sorties = $sortieRepository->findByFilter($filtreSortie);
             return $this->render('main/home.html.twig', [
                 "filtreForm" => $filtreForm,
