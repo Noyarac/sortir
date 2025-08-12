@@ -55,7 +55,7 @@ final class SortieController extends AbstractController
 
             $message = $etat === Etat::OUVERTE->value
                 ? "Sortie créée avec succès!"
-                : "Sortie modifiée avec succès! Attention, elle n'est pas encore publiée.";
+                : "Sortie créée avec succès! Attention, elle n'est pas encore publiée.";
 
             $this->addFlash("success", $message);
             return $this->redirectToRoute('main_home');
@@ -63,6 +63,7 @@ final class SortieController extends AbstractController
 
         return $this->render('sortie/creation-modification.html.twig', [
             'sortieForm' => $sortieForm,
+            'sortie' => $sortie,
             'isModification' => false,
         ]);
     }
@@ -71,8 +72,11 @@ final class SortieController extends AbstractController
     #[IsGranted('sortie_modification', 'sortie')]
     public function modificationSortie(Sortie $sortie, Request $request, EntityManagerInterface $entityManager): Response
     {
-
         $sortieForm = $this->createForm(SortieType::class, $sortie);
+        $ville = $sortie->getLieu()->getVille();
+        //On pré-remplit le champ "ville" qui est non mappé
+        $sortieForm->get('ville')->setData($ville);
+
         $sortieForm->handleRequest($request);
 
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
