@@ -2,19 +2,20 @@
 
 namespace App\Controller;
 
+use App\Entity\Sortie;
 use App\Entity\User;
 use App\Entity\Ville;
 use App\Form\DTO\FiltreVille;
 use App\Form\FiltreVilleType;
 use App\Form\UserType;
 use App\Form\VilleType;
+use App\Repository\SortieRepository;
 use App\Repository\UserRepository;
 use App\Repository\VilleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -98,8 +99,18 @@ final class AdministrationController extends AbstractController
     }
 
     #[Route('/villes/{id}/supprimer', name: 'admin_supprimerVille', requirements: ['id'=>'\d+'], methods: ['POST'])]
-    public function supprimerVille(Ville $ville, Request $request, EntityManagerInterface $entityManager): Response
+    public function supprimerVille(Ville $ville, EntityManagerInterface $entityManager): Response
     {
+        //Vérification absence référencement de la ville dans une sortie
+        /** @var SortieRepository $sortieRepository */
+        $sortieRepository = $entityManager->getRepository(Sortie::class);
+        $nbSortiesUtilisantVille = $sortieRepository->countByVille($ville);
+        if ($nbSortiesUtilisantVille > 0) {
+            $this->addFlash("danger", "Cette ville ne peut pas être supprimée, elle est référencée dans une ou plusieurs sorties.");
+            return $this->redirectToRoute('admin_villes');
+        }
+
+
         $entityManager->remove($ville);
         $entityManager->flush();
         $this->addFlash('success', 'La ville '.$ville->getNom(). ' a bien été supprimée');
