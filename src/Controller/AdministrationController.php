@@ -99,8 +99,15 @@ final class AdministrationController extends AbstractController
     }
 
     #[Route('/villes/{id}/supprimer', name: 'admin_supprimerVille', requirements: ['id'=>'\d+'], methods: ['POST'])]
-    public function supprimerVille(Ville $ville, EntityManagerInterface $entityManager): Response
+    public function supprimerVille(Ville $ville, EntityManagerInterface $entityManager, Request $request): Response
     {
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('suppression_ville_' . $ville->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $this->addFlash('danger', "Cette ville n'a pas pu être supprimée, jeton CSRF invalide");
+            return $this->redirectToRoute('admin_villes');
+        }
+
         //Vérification absence référencement de la ville dans une sortie
         /** @var SortieRepository $sortieRepository */
         $sortieRepository = $entityManager->getRepository(Sortie::class);
