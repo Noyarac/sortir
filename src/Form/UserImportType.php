@@ -22,7 +22,11 @@ class UserImportType extends AbstractType
                 'constraints' => [
                     new File(
                         maxSize: '5M',
-                        mimeTypes: 'text/csv',
+                        mimeTypes : [
+                        'text/csv',
+                        'text/plain',
+                        'application/vnd.ms-excel',
+                        ],
                         mimeTypesMessage: 'Merci de télécharger un fichier CSV valide'
                     ),
                 ]

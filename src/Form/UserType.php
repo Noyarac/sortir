@@ -109,7 +109,7 @@ class UserType extends AbstractType
                 ->add('plainPassword', RepeatedType::class, [
                     'type' => PasswordType::class,
                     'invalid_message' => 'Les mots de passe doivent correspondre.',
-                    'mapped' => false,
+                    'mapped' => true,
                     'required' => $options['creation'],
                     'first_options'  => [
                         'label' => 'Nouveau mot de passe',
@@ -118,13 +118,6 @@ class UserType extends AbstractType
                     'second_options' => [
                         'label' => 'Confirmation mot de passe',
                     ],
-                    'constraints' => [
-                        new Length(max: 4096),
-                        new Regex(
-                            pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={}\[\]|:;\/\\\\"\'<>,.?~]).{8,}$/',
-                            message: "Le mot de passe doit comporter au minimum 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial : !@#$%^&*()_-+={}[]|:;/\"'<>,.?~",
-                        )
-                    ]
                 ]);
         }
     }

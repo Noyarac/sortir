@@ -131,17 +131,21 @@ final class AdministrationController extends AbstractController
         $userImportForm->handleRequest($request);
 
         if($userImportForm->isSubmitted() && $userImportForm->isValid()){
-            //Ajout traitement fichier csv d'import des utilisateurs
+            //Le fichier doit contenir les infos suivantes : campus, nom, prenom, email
             $csvFile = $userImportForm->get('csvFile')->getData();
-            if(!file_exists($csvFile)){
-                $this->addFlash('danger', "Le fichier '.$csvFile.' n'existe pas");
+            //fichier transmis au service pour traitement (création utilisateurs)
+            try{
+                $nbUtilisateursCrees = $userImportService->importFromFile($csvFile->getPathname());
+                $message = $nbUtilisateursCrees == 1 ? "Un utilisateur a été créé" : "{$nbUtilisateursCrees} utilisateurs ont été créés";
+                $this->addFlash('success', $message);
+                return $this->redirectToRoute('admin_listeUtilisateurs');
+            } catch (\RuntimeException $e) {
+                $this->addFlash('danger', $e->getMessage());
+                return $this->redirectToRoute('admin_listeUtilisateurs');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', "Une erreur technique est survenue lors de l'import. Veuillez réésayer plus tard");
                 return $this->redirectToRoute('admin_listeUtilisateurs');
             }
-            //on récupère le chemin temporaire où est stocké le fichier
-            $filePath = $csvFile->getPathname();
-            $nbUtilisateursCrees = $userImportService->importFromFile($filePath);
-            $this->addFlash('success', $nbUtilisateursCrees. ' utilisateur(s) ont été créés');
-            return $this->redirectToRoute('admin_listeUtilisateurs');
         }
 
         return $this->render('admin/listeUtilisateurs.html.twig', [
@@ -194,9 +198,10 @@ final class AdministrationController extends AbstractController
 
         $userForm->handleRequest($request);
         if($userForm->isSubmitted() && $userForm->isValid()){
-            $plainPassword = $userForm->get('plainPassword')->getData();
+            $plainPassword = $user->getPlainPassword();
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
+            $user->setPlainPassword(null);
 
             if ($userForm->get("deleteImage")->getViewData()) {
                 $fileSystem = new Filesystem;
