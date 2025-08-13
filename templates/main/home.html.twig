@@ -120,13 +120,15 @@
         </div>
 	</section>
     <script>
-    function clearFilter() {
-        let inputs = Array.from(document.forms["filtre_sortie"].querySelectorAll("input"))
-            .filter(e => !["filtre_sortie__token"].includes(e.id))
-        for (let input of inputs) {
-            input.value = null
-            input.checked = null
-        }
+function clearFilter() {
+    const form = document.forms["filtre_sortie"]
+    const inputs = Array.from(form.querySelectorAll("input")).filter(e => !["filtre_sortie__token"].includes(e.id))
+    for (let input of inputs) {
+        input.value = null
+        input.checked = null
     }
+    const select = form.querySelector("select")
+    select.value = "{{ filtreForm.vars.data.user.campus.id }}"
+}
     </script>
 {% endblock %}
