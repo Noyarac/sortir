@@ -124,24 +124,6 @@ final class AdministrationController extends AbstractController
 
     }
 
-
-   /* #[Route('/villes/{id}/modifier', name: 'admin_modifierVille', requirements: ['id'=>'\d+'], methods: ['GET', 'POST'])]
-    public function modifierVille(Ville $ville, Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $villeForm = $this->createForm(VilleType::class, $ville);
-        $villeForm->handleRequest($request);
-
-        if ($villeForm->isSubmitted() && $villeForm->isValid()) {
-            $entityManager->flush();
-            $this->addFlash('success', 'Ville mise à jour');
-            return $this->redirectToRoute('admin_villes');
-        }
-
-        return $this->render('admin/modifierVille.html.twig', [
-            "villeForm" => $villeForm,
-        ]);
-    }*/
-
     #[Route('/villes/{id}/supprimer', name: 'admin_supprimerVille', requirements: ['id'=>'\d+'], methods: ['POST'])]
     public function supprimerVille(Ville $ville, EntityManagerInterface $entityManager, Request $request): Response
     {
