@@ -10,6 +10,7 @@ use App\Repository\CampusRepository;
 use App\Repository\SortieRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -52,12 +53,18 @@ final class CampusController extends AbstractController
                     "action" => $this->generateUrl("admin_campus_modifier", ["id" => $campus->getId()]),
                     "method" => "POST",
                 ]
-            )->createView(), $allCampus)
+            ), $allCampus)
         );
+        $erreur = $session->get("erreurModificationCampus");
+        if ($erreur) {
+            $modifyCampusForms["campus" . $erreur->getId()]->get("nom")->addError(new FormError($erreur->getNom() . " est déjà utilisé par un autre campus"));
+            $session->set("erreurModificationCampus", null);
+        }
+        $modifyCampusForms = array_map(fn($f) => $f->createView(), $modifyCampusForms);
 
         return $this->render(
             'admin/gestionCampus.html.twig',
-            compact("allCampus", "filtreForm", "newCampusForm", "modifyCampusForms")
+            compact("allCampus", "filtreForm", "newCampusForm", "modifyCampusForms", "erreur")
         );
     }
 
@@ -110,6 +117,9 @@ final class CampusController extends AbstractController
             $em->persist($campus);
             $em->flush();
             $this->addFlash('success', $campus->getNom(). ' a bien été modifié.');
+        } else {
+            $session = $request->getSession();
+            $session->set("erreurModificationCampus", $form->getData());
         }
 
         return $this->redirectToRoute("admin_campus_list");

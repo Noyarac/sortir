@@ -41,7 +41,7 @@
 						{{ form_end(newCampusForm)}}
 					</tr>
 					{% for campus in allCampus %}
-						<tr id="display_campus_{{ campus.id }}">
+						<tr style="display: {{ erreur and erreur.id == campus.id ? 'none' : 'table-row'}}"  id="display_campus_{{ campus.id }}">
 							<td class="col-6">{{ campus.nom | title }}</td>
 							<td class="col-auto d-flex flex-row gap-2">
 								<button id="modifyButton_{{ campus.id }}" class="btn btn-outline-secondary" onclick="swapModifyRow(this)">Modifier</button>
@@ -52,7 +52,7 @@
 
 							</td>
 						</tr>
-						<tr style="display: none;" id="modify_campus_{{ campus.id }}">
+						<tr style="display: {{ erreur and erreur.id == campus.id ? 'table-row' : 'none'}};" id="modify_campus_{{ campus.id }}">
 							{{ form_start(modifyCampusForms["campus" ~ campus.id])}}
 							<td class="col-6">{{ form_widget(modifyCampusForms["campus" ~ campus.id].nom)}}{{ form_errors(modifyCampusForms["campus" ~ campus.id].nom)}}</td>
 							<td class="col-auto d-flex flex-row gap-2">
