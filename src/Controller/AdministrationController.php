@@ -168,9 +168,8 @@ final class AdministrationController extends AbstractController
         return $this->redirectToRoute('admin_villes');
     }
 
-
-    #[Route('/utilisateurs/liste', name: 'admin_listeUtilisateurs', methods: ['GET', 'POST'])]
-    public function listeUtilisateurs(EntityManagerInterface $entityManager, Request $request, UserImportService $userImportService): Response
+    #[Route('/utilisateurs', name: 'admin_gestionUtilisateurs', methods: ['GET', 'POST'])]
+    public function gestionUtilisateurs(EntityManagerInterface $entityManager, Request $request, UserImportService $userImportService): Response
     {
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
@@ -187,17 +186,17 @@ final class AdministrationController extends AbstractController
                 $nbUtilisateursCrees = $userImportService->importFromFile($csvFile->getPathname());
                 $message = $nbUtilisateursCrees == 1 ? "Un utilisateur a été créé" : "{$nbUtilisateursCrees} utilisateurs ont été créés";
                 $this->addFlash('success', $message);
-                return $this->redirectToRoute('admin_listeUtilisateurs');
+                return $this->redirectToRoute('admin_gestionUtilisateurs');
             } catch (\RuntimeException $e) {
                 $this->addFlash('danger', $e->getMessage());
-                return $this->redirectToRoute('admin_listeUtilisateurs');
+                return $this->redirectToRoute('admin_gestionUtilisateurs');
             } catch (\Exception $e) {
                 $this->addFlash('danger', "Une erreur technique est survenue lors de l'import. Veuillez réésayer plus tard");
-                return $this->redirectToRoute('admin_listeUtilisateurs');
+                return $this->redirectToRoute('admin_gestionUtilisateurs');
             }
         }
 
-        return $this->render('admin/listeUtilisateurs.html.twig', [
+        return $this->render('admin/gestionUtilisateurs.html.twig', [
             'listeUtilisateurs' => $listeUtilisateurs,
             'userImportForm' => $userImportForm,
         ]);
@@ -228,7 +227,7 @@ final class AdministrationController extends AbstractController
             }
             $entityManager->flush();
             $this->addFlash('success', 'Profil mis à jour avec succès!');
-            return $this->redirectToRoute('admin_listeUtilisateurs');
+            return $this->redirectToRoute('admin_gestionUtilisateurs');
         }
         return $this->render('profil/creation-modificationProfil.html.twig', [
             'userForm' => $userForm,
@@ -269,13 +268,31 @@ final class AdministrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
             $this->addFlash('success', 'Nouvel utilisateur créé avec succès!');
-            return $this->redirectToRoute('admin_listeUtilisateurs');
+            return $this->redirectToRoute('admin_gestionUtilisateurs');
         }
 
         return $this->render('profil/creation-modificationProfil.html.twig', [
             'userForm' => $userForm,
             "user" => $user,
         ]);
+    }
+
+    #[Route('/utilisateurs/{id}/toggle', name: 'admin_toggleCompteUtilisateur', requirements: ['id'=>'\d+'], methods: ['POST'])]
+    public function toggleCompteUtilisateur(User $user, Request $request, EntityManagerInterface $entityManager) : Response
+    {
+        // Vérifier le token CSRF
+        $tokenIsValid = $this->isCsrfTokenValid('toggle_compte_utilisateur_' . $user->getId(), $request->request->get('_token'));
+        if (!$tokenIsValid) {
+            $message = $user->isActif() ? "Ce compte n'a pas pu être désactivé, jeton CSRF invalide" : "Ce compte n'a pas pu être activé, jeton CSRF invalide";
+            $this->addFlash('danger', $message);
+            return $this->redirectToRoute('admin_gestionUtilisateurs');
+        }
+
+        $user->setActif(!$user->isActif());
+        $entityManager->flush();
+
+        $this->addFlash('success', "Le compte de ". $user->getPseudo()." a bien été ". ($user->isActif() ? 'activé' : 'désactivé').".");
+        return $this->redirectToRoute('admin_gestionUtilisateurs');
     }
 
 }
