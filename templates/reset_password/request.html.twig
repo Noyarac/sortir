@@ -3,10 +3,10 @@
 {% block title %}{{ parent() }} | Mot de passe oublié ?{% endblock %}
 
 {% block body %}
+    <div class="container" style="max-width: 60ch;">
     {% for flash_error in app.flashes('reset_password_error') %}
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
-    <div class="container" style="max-width: 60ch;">
     <h1 class="h3 my-4 pt-4">Réinitialisez votre mot de passe</h1>
 
     {{ form_start(requestForm) }}

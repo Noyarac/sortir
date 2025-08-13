@@ -3,9 +3,12 @@
 {% block title %}Email de réinitialisation envoyé{% endblock %}
 
 {% block body %}
+    <div class="container" style="max-width: 80ch;">
+    <h1 class="h3 mt-4 mb-2">Merci !</h1>
     <p>
         Si un compte avec cet email existe, alors un email contenant un lien pour réinitialiser le mot de passe vient d'être envoyé.
         Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
     </p>
     <p>Si vous ne recevez pas cet email, vérifiez votre dossier de messages indésirables ou <a href="{{ path('app_forgot_password_request') }}">essayez à nouveau</a>.</p>
+    </div>
 {% endblock %}
