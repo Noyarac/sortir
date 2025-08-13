@@ -15,6 +15,7 @@ class FiltreVilleType extends AbstractType
         $builder
             ->add('nomContient', TextType::class, [
                 'label' => 'Le nom contient',
+                'required' => false,
                 'attr' => [
                     'maxlength' => 50,
                 ]
