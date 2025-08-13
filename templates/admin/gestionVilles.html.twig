@@ -49,7 +49,7 @@
                                 <div class="col-auto">
                                     <button type="submit" class="btn btn-primary">Ajouter</button>
                                     {% if newVilleFormHasErrors %}
-                                        <a href="{{ path('admin_villes') }}" class="btn btn-secondary">Annuler</a>
+                                        <a href="{{ path('admin_gestionVilles') }}" class="btn btn-secondary">Annuler</a>
                                     {% endif %}
                                 </div>
                             </div>
@@ -93,7 +93,7 @@
                                         <div class="col-auto">
                                             {{ form_rest(formView) }} {# CSRF token et autres champs #}
                                             <button class="btn btn-outline-primary" type="submit">Enregistrer</button>
-                                            <a href="{{ path('admin_villes') }}" class="btn btn-secondary">Annuler</a>
+                                            <a href="{{ path('admin_gestionVilles') }}" class="btn btn-secondary">Annuler</a>
                                         </div>
                                     </div>
                                     {{ form_end(formView) }}

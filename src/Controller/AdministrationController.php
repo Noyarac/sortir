@@ -33,7 +33,7 @@ final class AdministrationController extends AbstractController
         return $this->render('admin/home.html.twig', [
         ]);
     }
-    private function preparerVueAdminVille(EntityManagerInterface $entityManager) : array
+    private function preparerVueGestionVille(EntityManagerInterface $entityManager) : array
     {
         /** @var VilleRepository $villeRepository */
         $villeRepository = $entityManager->getRepository(Ville::class);
@@ -42,6 +42,7 @@ final class AdministrationController extends AbstractController
         $villes = $villeRepository->findBy([], ['nom' => 'ASC']);
 
         //Formulaire de création d'une nouvelle ville
+
         $newVille= new Ville();
         $newVilleForm = $this->createForm(VilleType::class, $newVille, [
             'action' => $this->generateUrl('admin_creerVille'),
@@ -63,10 +64,10 @@ final class AdministrationController extends AbstractController
         return compact('villes', 'filtreVilleForm', 'newVilleForm', 'modifyVilleForms', 'newVille');
     }
 
-    #[Route('/villes', name: 'admin_villes', methods: ['GET', 'POST'])]
+    #[Route('/villes', name: 'admin_gestionVilles', methods: ['GET', 'POST'])]
     public function gestionVilles(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $data = $this->preparerVueAdminVille($entityManager);
+        $data = $this->preparerVueGestionVille($entityManager);
 
         /** @var VilleRepository $villeRepository */
         $villeRepository = $entityManager->getRepository(Ville::class);
@@ -87,7 +88,7 @@ final class AdministrationController extends AbstractController
     #[Route('/villes/creer', name: 'admin_creerVille', methods: ['POST'])]
     public function creerVille(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $data = $this->preparerVueAdminVille($entityManager);
+        $data = $this->preparerVueGestionVille($entityManager);
 
         $newVille = $data['newVille'];
         $newVilleForm = $data['newVilleForm'];
@@ -98,7 +99,7 @@ final class AdministrationController extends AbstractController
             $entityManager->persist($newVille);
             $entityManager->flush();
             $this->addFlash('success','Ville créée avec succès!');
-            return $this->redirectToRoute('admin_villes');
+            return $this->redirectToRoute('admin_gestionVilles');
         }
 
         return $this->render('admin/gestionVilles.html.twig', $data);
@@ -107,17 +108,15 @@ final class AdministrationController extends AbstractController
     #[Route('/villes/{id}/modifier', name: 'admin_modifierVille', requirements: ['id'=>'\d+'], methods: ['POST'])]
     public function modifierVille(Ville $ville, Request $request, EntityManagerInterface $entityManager): Response
     {
-        $data = $this->preparerVueAdminVille($entityManager);
-
-        $modifyVilleForms = $data['modifyVilleForms'];
+        $data = $this->preparerVueGestionVille($entityManager);
 
         $form = $data["modifyVilleForms"][$ville->getId()];
         $form->handleRequest($request);
-        $modifyVilleForms[$ville->getId()] = $form; //on remplace le formulaire et créé la vue pour bien afficher les erreurs
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
             $this->addFlash('success', 'Ville mise à jour');
-            return $this->redirectToRoute('admin_villes');
+            return $this->redirectToRoute('admin_gestionVilles');
         }
 
         return $this->render('admin/gestionVilles.html.twig', $data);
@@ -131,7 +130,7 @@ final class AdministrationController extends AbstractController
         $tokenIsValid = $this->isCsrfTokenValid('suppression_ville_' . $ville->getId(), $request->request->get('_token'));
         if (!$tokenIsValid) {
             $this->addFlash('danger', "Cette ville n'a pas pu être supprimée, jeton CSRF invalide");
-            return $this->redirectToRoute('admin_villes');
+            return $this->redirectToRoute('admin_gestionVilles');
         }
 
         //Vérification absence référencement de la ville dans une sortie
@@ -140,14 +139,13 @@ final class AdministrationController extends AbstractController
         $nbSortiesUtilisantVille = $sortieRepository->countByVille($ville);
         if ($nbSortiesUtilisantVille > 0) {
             $this->addFlash("danger", "Cette ville ne peut pas être supprimée, elle est référencée dans une ou plusieurs sorties.");
-            return $this->redirectToRoute('admin_villes');
+            return $this->redirectToRoute('admin_gestionVilles');
         }
-
 
         $entityManager->remove($ville);
         $entityManager->flush();
         $this->addFlash('success', 'La ville '.$ville->getNom(). ' a bien été supprimée');
-        return $this->redirectToRoute('admin_villes');
+        return $this->redirectToRoute('admin_gestionVilles');
     }
 
     #[Route('/utilisateurs', name: 'admin_gestionUtilisateurs', methods: ['GET', 'POST'])]
