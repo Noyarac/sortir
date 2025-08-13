@@ -61,8 +61,8 @@ class SortieRepository extends ServiceEntityRepository
             )')
                 ->setParameter('nonParticipantId', $filtreSortie->getUser()->getId());
         }
-        if ($filtreSortie->getTerminees()) {
-            $qb->andWhere("s.etat = '" . Etat::TERMINEE->value ."'");
+        if (!$filtreSortie->getTerminees()) {
+            $qb->andWhere("s.etat != '" . Etat::TERMINEE->value ."'");
         }
 
 
