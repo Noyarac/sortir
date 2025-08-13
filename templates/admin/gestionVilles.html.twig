@@ -21,51 +21,76 @@
     <hr>
     <section>
         <div class="container">
-            {{ form_start(villeForm, {'attr': {'data-turbo': 'false'}}) }}
+
+            {{ form_start(newVilleForm, {'attr': {'data-turbo': 'false'}}) }}
             <div class="row align-items-end">
                 <div class="col-6">
-                    {{ form_row(villeForm.nom) }}
+                    {{ form_row(newVilleForm.nom) }}
                 </div>
                 <div class="col-3">
-                    {{ form_row(villeForm.codePostal) }}
+                    {{ form_row(newVilleForm.codePostal) }}
                 </div>
                 <div class="col-auto mb-3">
                     <button type="submit" class="btn btn-primary w-100">Ajouter</button>
                 </div>
-            {{ form_end(villeForm) }}
-            <div>
-                <table class="table" >
-                    <thead>
-                    <tr>
-                        <th>Ville</th>
-                        <th>Code postal</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        {% if villes is not empty %}
-                            {% for ville in villes %}
-                                <tr>
-                                    <td class="col-6">{{ ville.nom | upper }}</td>
-                                    <td class="col-3">{{ ville.codePostal }}</td>
-                                    <td class="col-auto d-flex gap-2">
-                                        <a href="{{ path('admin_modifierVille', {'id': ville.id}) }}" class="btn btn-outline-secondary">Modifier</a>
-                                        <form method="post"
-                                              action="{{ path('admin_supprimerVille', parameters: {id: ville.id}) }}"
-                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette ville ?');">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('suppression_ville_' ~ ville.id) }}">
-                                            <button class="btn btn-outline-danger" type="submit">Supprimer</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% endif %}
-                    </tbody>
-                </table>
             </div>
+            {{ form_end(newVilleForm) }}
+
+            <table class="table" >
+                <thead>
+                <tr>
+                    <th>Ville</th>
+                    <th>Code postal</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% if villes is not empty %}
+                        {% for ville in villes %}
+                            {# Ligne d'affichage #}
+                            <tr id="display_ville_{{ ville.id }}">
+                                <td class="col-6">{{ ville.nom | upper }}</td>
+                                <td class="col-3">{{ ville.codePostal }}</td>
+                                <td class="col-auto d-flex gap-2">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="swapModifyRow({{ ville.id }})">Modifier</button>
+                                    <form method="post"
+                                          action="{{ path('admin_supprimerVille', parameters: {id: ville.id}) }}"
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette ville ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('suppression_ville_' ~ ville.id) }}">
+                                        <button class="btn btn-outline-danger" type="submit">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {# Ligne de modification cachée #}
+                            <tr id="modify_ville_{{ ville.id }}" style="display:none;">
+                                <td colspan="3">
+                                    {% set formView = modifyVilleForms[ville.id].createView() %}
+                                    {{ form_start(formView, {"attr": {"class": "d-flex gap-2 align-items-center", 'data-turbo': 'false'}}) }}
+                                    {{ form_widget(formView.nom) }}
+                                    {{ form_errors(formView.nom) }}
+                                    {{ form_widget(formView.codePostal) }}
+                                    {{ form_errors(formView.codePostal) }}
+                                    {{ form_rest(formView) }} {# CSRF token et autres champs #}
+                                    <button class="btn btn-outline-primary" type="submit">Enregistrer</button>
+                                    <button type="button" class="btn btn-secondary" onclick="swapModifyRow({{ ville.id }})">Annuler</button>
+                                    {{ form_end(formView) }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
             {% if villes is empty %}
                 <p>Aucune ville ne correspond au critère de recherche.</p>
             {% endif %}
+        </div>
     </section>
+    <script>
+        function swapModifyRow(id) {
+            document.getElementById(`display_ville_${id}`).style.display = document.getElementById(`display_ville_${id}`).style.display=='none' ? '' : 'none';
+            document.getElementById(`modify_ville_${id}`).style.display = document.getElementById(`modify_ville_${id}`).style.display=='none' ? '' : 'none';
+        }
+
+    </script>
 {% endblock %}
 

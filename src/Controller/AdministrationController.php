@@ -33,51 +33,99 @@ final class AdministrationController extends AbstractController
         return $this->render('admin/home.html.twig', [
         ]);
     }
-
-    #[Route('/villes', name: 'admin_villes', methods: ['GET', 'POST'])]
-    public function gestionVilles(Request $request, EntityManagerInterface $entityManager): Response
+    private function preparerVueAdminVille(EntityManagerInterface $entityManager) : array
     {
+        /** @var VilleRepository $villeRepository */
         $villeRepository = $entityManager->getRepository(Ville::class);
 
         //On remonte de la BDD toutes les villes
         $villes = $villeRepository->findBy([], ['nom' => 'ASC']);
 
         //Formulaire de création d'une nouvelle ville
-        $ville= new Ville();
-        $villeForm = $this->createForm(VilleType::class, $ville);
-        $villeForm->handleRequest($request);
-
-        if ($villeForm->isSubmitted() && $villeForm->isValid()) {
-            $entityManager->persist($ville);
-            $entityManager->flush();
-            $this->addFlash('success','Ville créée avec succès!');
-            return $this->redirectToRoute('admin_villes');
+        $newVille= new Ville();
+        $newVilleForm = $this->createForm(VilleType::class, $newVille, [
+            'action' => $this->generateUrl('admin_creerVille'),
+            'method' => 'POST'
+        ]);
+        //Formulaire de modification d'une ville
+        $modifyVilleForms = [];
+        foreach ($villes as $ville) {
+            $form = $this->createForm(VilleType::class, $ville, [
+                'action' => $this->generateUrl('admin_modifierVille', ['id' => $ville->getId()]),
+                'method' => 'POST',
+            ]);
+            $modifyVilleForms[$ville->getId()] = $form;
         }
-
         //Formulaire de filtre
         $filtreVille = new filtreVille();
-        /** @var VilleRepository $villeRepository */
         $filtreVilleForm = $this->createForm(FiltreVilleType::class, $filtreVille);
+
+        return compact('villes', 'filtreVilleForm', 'newVilleForm', 'modifyVilleForms', 'newVille');
+    }
+
+    #[Route('/villes', name: 'admin_villes', methods: ['GET', 'POST'])]
+    public function gestionVilles(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $data = $this->preparerVueAdminVille($entityManager);
+
+        /** @var VilleRepository $villeRepository */
+        $villeRepository = $entityManager->getRepository(Ville::class);
+
+        $filtreVilleForm = $data['filtreVilleForm'];
+
         $filtreVilleForm->handleRequest($request);
 
         if ($filtreVilleForm->isSubmitted() && $filtreVilleForm->isValid()) {
             $nomContient = $filtreVilleForm->get('nomContient')->getData();
             $villes = $villeRepository->findVillesByFilters($nomContient);
-            return $this->render('admin/gestionVilles.html.twig', [
-                "filtreVilleForm" => $filtreVilleForm,
-                "villes" => $villes,
-                "villeForm" => $villeForm,
-            ]);
+            $data['villes'] = $villes;
         }
 
-        return $this->render('admin/gestionVilles.html.twig', [
-            "filtreVilleForm" => $filtreVilleForm,
-            "villes" => $villes,
-            "villeForm" => $villeForm,
-        ]);
+        return $this->render('admin/gestionVilles.html.twig', $data);
     }
 
-    #[Route('/villes/{id}/modifier', name: 'admin_modifierVille', requirements: ['id'=>'\d+'], methods: ['GET', 'POST'])]
+    #[Route('/villes/creer', name: 'admin_creerVille', methods: ['POST'])]
+    public function creerVille(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $data = $this->preparerVueAdminVille($entityManager);
+
+        $newVille = $data['newVille'];
+        $newVilleForm = $data['newVilleForm'];
+
+        $newVilleForm->handleRequest($request);
+
+        if ($newVilleForm->isSubmitted() && $newVilleForm->isValid()) {
+            $entityManager->persist($newVille);
+            $entityManager->flush();
+            $this->addFlash('success','Ville créée avec succès!');
+            return $this->redirectToRoute('admin_villes');
+        }
+
+        return $this->render('admin/gestionVilles.html.twig', $data);
+    }
+
+    #[Route('/villes/{id}/modifier', name: 'admin_modifierVille', requirements: ['id'=>'\d+'], methods: ['POST'])]
+    public function modifierVille(Ville $ville, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $data = $this->preparerVueAdminVille($entityManager);
+
+        $modifyVilleForms = $data['modifyVilleForms'];
+
+        $form = $data["modifyVilleForms"][$ville->getId()];
+        $form->handleRequest($request);
+        $modifyVilleForms[$ville->getId()] = $form; //on remplace le formulaire et créé la vue pour bien afficher les erreurs
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+            $this->addFlash('success', 'Ville mise à jour');
+            return $this->redirectToRoute('admin_villes');
+        }
+
+        return $this->render('admin/gestionVilles.html.twig', $data);
+
+    }
+
+
+   /* #[Route('/villes/{id}/modifier', name: 'admin_modifierVille', requirements: ['id'=>'\d+'], methods: ['GET', 'POST'])]
     public function modifierVille(Ville $ville, Request $request, EntityManagerInterface $entityManager): Response
     {
         $villeForm = $this->createForm(VilleType::class, $ville);
@@ -92,7 +140,7 @@ final class AdministrationController extends AbstractController
         return $this->render('admin/modifierVille.html.twig', [
             "villeForm" => $villeForm,
         ]);
-    }
+    }*/
 
     #[Route('/villes/{id}/supprimer', name: 'admin_supprimerVille', requirements: ['id'=>'\d+'], methods: ['POST'])]
     public function supprimerVille(Ville $ville, EntityManagerInterface $entityManager, Request $request): Response
@@ -119,6 +167,7 @@ final class AdministrationController extends AbstractController
         $this->addFlash('success', 'La ville '.$ville->getNom(). ' a bien été supprimée');
         return $this->redirectToRoute('admin_villes');
     }
+
 
     #[Route('/utilisateurs/liste', name: 'admin_listeUtilisateurs', methods: ['GET', 'POST'])]
     public function listeUtilisateurs(EntityManagerInterface $entityManager, Request $request, UserImportService $userImportService): Response
