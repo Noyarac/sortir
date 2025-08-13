@@ -16,7 +16,7 @@ security:
         api:
             pattern: ^/api
             stateless: true
-            # provider: app_user_provider
+            provider: app_user_provider
             http_basic: ~
         main:
             lazy: true
@@ -46,7 +46,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/api, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: ROLE_USER }
         - { path: ^/login$, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/, roles: ROLE_USER }
