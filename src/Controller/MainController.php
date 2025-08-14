@@ -2,14 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Form\DTO\FiltreSortie;
-use App\Form\FiltreSortiesType;
 use App\Form\FiltreSortieType;
 use App\Repository\CampusRepository;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -31,7 +28,7 @@ final class MainController extends AbstractController
         $session = $request->getSession();
         $filtreSortie = $session->get("filtreSortie") ?: $filtreSortie;
 
-        // Rechargement de l'objet Campus
+        // Rechargement de l'objet Campus (Sinon erreur : Entity must be managed)
         $filtreSortie->setCampus($campusRepository->find($filtreSortie->getCampus()->getId()));
 
         // Creation du formulaire de filtre
@@ -40,11 +37,6 @@ final class MainController extends AbstractController
 
         if ($filtreForm->isSubmitted() && $filtreForm->isValid()) {
             $session->set("filtreSortie", $filtreSortie);
-            $sorties = $sortieRepository->findByFilter($filtreSortie);
-            return $this->render('main/home.html.twig', [
-                "filtreForm" => $filtreForm,
-                "sorties" => $sorties,
-            ]);
         }
 
         $sorties = $sortieRepository->findByFilter($filtreSortie);
