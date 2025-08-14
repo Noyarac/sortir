@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Lieu;
 use App\Entity\Ville;
+use App\Form\LieuType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/lieu')]
@@ -52,5 +54,39 @@ final class LieuController extends AbstractController
             ];
         }
         return $this->json($data);
+    }
+    #[Route('/creer', name:'lieu_creer', methods: ['POST'])]
+    public function creerLieu(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $lieu = new Lieu();
+        $lieuForm = $this->createForm(LieuType::class, $lieu);
+
+        $lieuForm->handleRequest($request);
+        if ($lieuForm->isSubmitted() && $lieuForm->isValid()) {
+            $entityManager->persist($lieu);
+            $entityManager->flush();
+
+            // pour améliorer l'UX on retourne le lieu créé ainsi que la ville correspondante
+            return $this->json([
+                'success' => true,
+                'lieu' => [
+                    'id' => $lieu->getId(),
+                    'nom' => $lieu->getNom(),
+                    'idVille' => $lieu->getVille()->getId(),
+                    ]
+            ]);
+        }
+
+        //Formulaire invalide-> on envoi les erreurs
+        $errors = [];
+        foreach ($lieuForm->getErrors(true) as $error) {
+            $field = $error->getOrigin()->getName();
+            $errors[$field][] = $error->getMessage();
+        }
+
+        return $this->json([
+            'success' => false,
+            'errors' => $errors
+        ]);
     }
 }

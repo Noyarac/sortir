@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Etat;
+use App\Entity\Lieu;
 use App\Entity\Sortie;
 use App\Entity\User;
+use App\Form\LieuType;
 use App\Form\SortieAnnulationType;
 use App\Form\SortieType;
 use App\Security\Voter\SortieVoter;
@@ -61,10 +63,15 @@ final class SortieController extends AbstractController
             return $this->redirectToRoute('main_home');
         }
 
+        //Formulaire de création d'un lieu
+        $lieu = new Lieu();
+        $lieuForm = $this->createForm(LieuType::class, $lieu);
+
         return $this->render('sortie/creation-modification.html.twig', [
             'sortieForm' => $sortieForm,
             'sortie' => $sortie,
             'isModification' => false,
+            'lieuForm' => $lieuForm,
         ]);
     }
 
@@ -93,10 +100,15 @@ final class SortieController extends AbstractController
             return $this->redirectToRoute('main_home');
         }
 
+        //Formulaire de création d'un lieu
+        $lieu = new Lieu();
+        $lieuForm = $this->createForm(LieuType::class, $lieu);
+
         return $this->render('sortie/creation-modification.html.twig', [
             'sortieForm' => $sortieForm,
             'sortie' => $sortie,
             'isModification' => true,
+            'lieuForm' => $lieuForm,
         ]);
     }
 

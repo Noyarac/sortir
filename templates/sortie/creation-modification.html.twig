@@ -71,23 +71,21 @@
 
         </div>
     </div>
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary rounded-circle p-0" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bi bi-plus"></i></button>
 
     <!-- Modal -->
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Créer une sortie</h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Créer un lieu</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-primary">Understood</button>
+                    {{ form_start(lieuForm, {'attr': {'id': 'lieuForm'}}) }}
+                    {{ form_widget(lieuForm) }}
+                        <button type="button" class="btn btn-primary" id="btnCreationLieu">Enregistrer</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    {{ form_end(lieuForm) }}
                 </div>
             </div>
         </div>
@@ -98,11 +96,13 @@
         document.addEventListener('turbo:render', init);
 
         function init() {
-            const villeSelect = document.getElementById('{{ sortieForm.ville.vars.id }}')
+            const villeSelect = document.getElementById('{{ sortieForm.ville.vars.id }}');
             const lieuSelect = document.getElementById('{{ sortieForm.lieu.vars.id }}');
 
+            const btnCreationLieu = document.getElementById('btnCreationLieu');
+
             if(villeSelect.value){
-                const selectedLieuId = '{{ sortie.lieu ? sortie.lieu.id : '' }}'
+                const selectedLieuId = '{{ sortie.lieu ? sortie.lieu.id : '' }}';
                 chargerLieuxEnFonctionDeVille(villeSelect.value, selectedLieuId);
             }
 
@@ -129,7 +129,7 @@
                     const option = document.createElement('option');
                     option.value = lieu.id;
                     option.textContent = lieu.nom;
-                    if(selectedLieuId && lieu.id == selectedLieuId){
+                    if(selectedLieuId && lieu.id === selectedLieuId){
                         option.selected = true;
                     }
                     lieuSelect.appendChild(option);
@@ -157,6 +157,53 @@
                 document.getElementById('{{ sortieForm.latitude.vars.id }}').value = '';
                 document.getElementById('{{ sortieForm.longitude.vars.id }}').value = '';
             }
+
+            function creerLieu(){
+                const lieuForm = document.getElementById('lieuForm');
+
+                //Création d'un FormData à partir du formulaire
+                const formData = new FormData(lieuForm);
+
+                //Envoi de la requête à lieuController
+                fetch(`/lieu/creer`, {method: 'POST', body: formData})
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.success){
+                            //Ajout du nouveau lieu au select de la sortie
+                            const option = document.createElement('option');
+                            option.value = data.lieu.id;
+                            option.textContent = data.lieu.nom;
+                            option.selected = true;
+                            lieuSelect.appendChild(option);
+
+                            //On sélectionne la ville correspondante au nouveau lieu créé
+                            villeSelect.value = data.lieu.idVille;
+
+                            //Fermer la modal
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('staticBackdrop'));
+                            modal.hide();
+                        } else{
+                            // Afficher les erreurs
+                            Object.keys(data.errors).forEach(fieldName => {
+                                const field = document.getElementById('lieu_' + fieldName);
+                                if(!field) return;
+
+                                // créer ou mettre à jour un div d'erreur sous le champ
+                                let errorDiv = field.nextElementSibling;
+                                if(!errorDiv || !errorDiv.classList.contains('text-danger')){
+                                    errorDiv = document.createElement('div');
+                                    errorDiv.classList.add('text-danger', 'mt-1');
+                                    field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                                }
+                                errorDiv.innerHTML = data.errors[fieldName].join('<br>');
+                            });
+                        }
+                    })
+            }
+
+            btnCreationLieu.addEventListener('click', function(){
+                creerLieu();
+            });
 
             villeSelect.addEventListener('change', function(){
                 chargerLieuxEnFonctionDeVille(this.value);

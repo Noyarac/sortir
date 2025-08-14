@@ -17,10 +17,20 @@ class LieuType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('ville', EntityType::class, [
+                'label' => 'Ville',
+                'class' => Ville::class,
+                'choice_label' => 'nom',
+                'placeholder' => 'Choisissez une ville',
+                'query_builder' => function (VilleRepository $villeRepository) {
+                    return $villeRepository->createQueryBuilder('v')
+                        ->orderBy('v.nom', 'ASC');
+                }
+            ])
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
                 'attr' => [
-                    'minlength' => 3,
+                    'minlength' => 2,
                     'maxlength' => 50,
                 ]
             ] )
@@ -36,7 +46,7 @@ class LieuType extends AbstractType
                 'attr' => [
                     'min'=> -90,
                     'max'=> 90,
-                    'step'=> '0.000001'
+                    'step'=> '0.000001',
                 ]
             ])
             ->add('longitude', NumberType::class, [
@@ -47,16 +57,7 @@ class LieuType extends AbstractType
                     'step'=> '0.000001'
                 ]
             ])
-            ->add('ville', EntityType::class, [
-                'label' => 'Ville',
-                'class' => Ville::class,
-                'choice_label' => 'nom',
-                'placeholder' => 'Choisissez une ville',
-                'query_builder' => function (VilleRepository $villeRepository) {
-                    return $villeRepository->createQueryBuilder('v')
-                        ->orderBy('v.nom', 'ASC');
-                }
-            ])
+
         ;
     }
 
