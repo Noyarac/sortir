@@ -53,6 +53,14 @@
                                         <button class="btn {{ utilisateur.actif ? 'btn-outline-danger' : 'btn-outline-success' }} w-100"
                                                 type="submit">{{ utilisateur.actif ? 'Inactiver compte' : 'Activer compte'}}</button>
                                     </form>
+                                    <form method="post"
+                                          action="{{ path('admin_utilisateur_supprimer', parameters: {id: utilisateur.id}) }}"
+                                          class="flex-fill"
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('suppression_utilisateur_' ~ utilisateur.id) }}">
+                                        <button class="btn btn-outline-danger w-100"
+                                                type="submit">Supprimer</button>
+                                    </form>
                             </td>
                         </tr>
                     {% endfor %}
