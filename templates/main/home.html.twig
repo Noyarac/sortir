@@ -40,7 +40,8 @@
 					{{ form_row(filtreForm.terminees) }}
 				</div>
 				<div class="col-2">
-					<button type="submit" class="btn btn-primary">Rechercher</button>
+					<button type="submit" class="btn btn-primary m-1">Rechercher</button>
+                    <button type="button" class="btn btn-secondary m-1" onclick="clearFilter()">Réinitialiser</button>
 				</div>
 			</div>
 		</div>
@@ -118,4 +119,16 @@
             {% endif %}
         </div>
 	</section>
+    <script>
+function clearFilter() {
+    const form = document.forms["filtre_sortie"]
+    const inputs = Array.from(form.querySelectorAll("input")).filter(e => !["filtre_sortie__token"].includes(e.id))
+    for (let input of inputs) {
+        input.value = null
+        input.checked = null
+    }
+    const select = form.querySelector("select")
+    select.value = "{{ filtreForm.vars.data.user.campus.id }}"
+}
+    </script>
 {% endblock %}

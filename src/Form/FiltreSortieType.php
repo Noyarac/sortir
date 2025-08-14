@@ -59,7 +59,7 @@ class FiltreSortieType extends AbstractType
                 "required" => false
             ])
             ->add('terminees', CheckboxType::class, [
-                'label' => "Sorties terminées",
+                'label' => "Inclure les sorties terminées",
                 "required" => false
             ])
         ;
