@@ -23,7 +23,17 @@
             <div class="col-md-6">
                 {{ form_row(sortieForm.campus) }}
                 {{ form_row(sortieForm.ville) }}
-                {{ form_row(sortieForm.lieu) }}
+                <div class="mb-3">
+                    {{ form_label(sortieForm.lieu) }}
+                    <div class="d-flex">
+                        {{ form_widget(sortieForm.lieu, {'attr': {'class': 'form-control me-2'}}) }}
+                        <button type="button" class="btn btn-primary rounded-circle p-0" style="width:38px; height:38px;"
+                                data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    {{ form_errors(sortieForm.lieu) }}
+                </div>
                 {{ form_row(sortieForm.codePostal) }}
                 {{ form_row(sortieForm.rue) }}
                 <div class="row">
@@ -69,14 +79,14 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Créer une sortie</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     ...
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                     <button type="button" class="btn btn-primary">Understood</button>
                 </div>
             </div>
