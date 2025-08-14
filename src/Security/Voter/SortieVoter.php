@@ -86,7 +86,7 @@ final class SortieVoter extends Voter
 
     private function annulation(Sortie $sortie, User $user) : bool {
         return
-            $user === $sortie->getOrganisateur()
+            ($user === $sortie->getOrganisateur() || in_array('ROLE_ADMIN', $user->getRoles()))
             && ($sortie->getEtat() == Etat::OUVERTE->value || $sortie->getEtat() == Etat::CLOTUREE->value);
     }
 }
