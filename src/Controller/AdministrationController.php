@@ -182,6 +182,37 @@ final class AdministrationController extends AbstractController
         ]);
     }
 
+    #[Route("/utilisateurs/{id}/supprimer", name: "admin_utilisateur_supprimer", requirements: ["id" => "\d+"], methods: ["POST"])]
+    public function supprimerUtilisateur(User $user, Request $request, EntityManagerInterface $em) : Response
+    {
+        $erreur = false;
+        // Vérification CSRF
+        $submittedToken = $request->getPayload()->get("_token");
+        if (!$this->isCsrfTokenValid("suppression_utilisateur_" . $user->getId(), $submittedToken)) {
+            $this->addFlash("danger", "Votre demande ne peut pas être traitée pour des questions de sécurité.");
+            $erreur = true;
+        }
+
+        // Vérification Utilisateur sans sortie
+        if (
+            sizeof($user->getParticipations()) > 0
+            || sizeof($user->getSortiesOrganisees()) > 0
+        )
+        {
+            $this->addFlash("info", "Vous ne pouvez pas supprimer cet utilisateur, car il participe ou organise des sorties.");
+            $erreur = true;
+        }
+
+        // Si pas d'erreur
+        if (!$erreur) {
+            $em->remove($user);
+            $em->flush();
+            $this->addFlash("success", $user->getPseudo() . " a bien été supprimé.");
+        }
+
+        return $this->redirectToRoute("admin_gestionUtilisateurs");
+    }
+
     #[Route('/utilisateurs/{id}/modifier', name: 'admin_modifierProfilUtilisateurs', requirements: ['id'=>'\d+'], methods: ['GET', 'POST'])]
     public function modifierProfilUtilisateur(User $user, EntityManagerInterface $entityManager, Request $request, UserPasswordHasherInterface $passwordHasher, SluggerInterface $slugger): Response
     {
