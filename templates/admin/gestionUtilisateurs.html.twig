@@ -44,13 +44,13 @@
                             <td>{{ utilisateur.campus}}</td>
                             <td>{{ utilisateur.actif ? "✔" : "" }}</td>
                             <td class="col-auto d-flex gap-2">
-                                <a href="{{ path('admin_modifierProfilUtilisateurs', {'id' : utilisateur.id}) }}" class="btn btn-outline-secondary mb-1 flex-fill">Modifier</a>
+                                <a href="{{ path('admin_modifierProfilUtilisateurs', {'id' : utilisateur.id}) }}" class="btn btn-outline-primary mb-1 flex-fill">Modifier</a>
                                     <form method="post"
                                           action="{{ path('admin_toggleCompteUtilisateur', parameters: {id: utilisateur.id}) }}"
                                           class="flex-fill"
                                           onsubmit="return confirm('Êtes-vous sûr de vouloir {{ utilisateur.actif ? 'inactiver' : 'activer' }} ce compte ?');">
                                         <input type="hidden" name="_token" value="{{ csrf_token('toggle_compte_utilisateur_' ~ utilisateur.id) }}">
-                                        <button class="btn {{ utilisateur.actif ? 'btn-outline-danger' : 'btn-outline-success' }} w-100"
+                                        <button class="btn {{ utilisateur.actif ? 'btn-outline-secondary' : 'btn-outline-success' }} w-100"
                                                 type="submit">{{ utilisateur.actif ? 'Inactiver compte' : 'Activer compte'}}</button>
                                     </form>
                                     <form method="post"
